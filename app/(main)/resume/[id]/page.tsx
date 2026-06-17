@@ -127,6 +127,59 @@ export default async function ResumeDetailPage({
         </Card>
       )}
 
+      {resume.type === "standard" && resume.status === "confirmed" && (
+        <Card>
+          <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <div>
+                <p className="font-medium">生成 JD 定制简历</p>
+                <p className="text-sm text-muted-foreground">
+                  基于此标准版简历和目标 JD，生成定制化简历
+                </p>
+              </div>
+            </div>
+            <Link href="/jd">
+              <Button>
+                <Sparkles className="h-4 w-4 mr-2" />
+                选择 JD 定制
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {resume.type === "tailored" &&
+        resume.confirmableItems &&
+        resume.confirmableItems.length > 0 &&
+        !resume.confirmCompleted && (
+          <Card>
+            <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                <div>
+                  <p className="font-medium">待确认项审核</p>
+                  <p className="text-sm text-muted-foreground">
+                    有{" "}
+                    {
+                      resume.confirmableItems.filter(
+                        (i) => i.status === "pending",
+                      ).length
+                    }{" "}
+                    项 AI 推断待确认
+                  </p>
+                </div>
+              </div>
+              <Link href={`/resume/${resume._id}/confirm`}>
+                <Button>
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  去审核
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
       {hasContent ? (
         <Tabs defaultValue="zh" className="w-full">
           <TabsList>
