@@ -228,3 +228,44 @@ describe("jd-parse 提示词", () => {
     expect(result.employmentType).toBe("全职");
   });
 });
+
+describe("resume-tailor 提示词（含待确认项）", () => {
+  it("系统提示词应包含待确认项机制说明", () => {
+    expect(RESUME_TAILOR_SYSTEM_PROMPT).toContain("待确认项");
+    expect(RESUME_TAILOR_SYSTEM_PROMPT).toContain("confirmableItems");
+    expect(RESUME_TAILOR_SYSTEM_PROMPT).toContain("inference");
+    expect(RESUME_TAILOR_SYSTEM_PROMPT).toContain("placeholder");
+  });
+
+  it("parseResumeTailorResult 应解析 confirmableItems 字段", () => {
+    const mockResponse = JSON.stringify({
+      content: { zh: "中文简历", en: "English resume" },
+      provenance: [],
+      matchAnalysis: { matchScore: 80, matchDetails: [], gapAnalysis: "无差距" },
+      aiFlavorScore: 0,
+      confirmableItems: [{
+        field: "experiences[0].bullets[0]",
+        type: "inference",
+        originalText: "参与了项目",
+        inferredText: "主导了项目",
+        question: "是否升级动词？",
+        options: ["接受推断", "保留原文", "自定义"],
+      }],
+    });
+    const result = parseResumeTailorResult(mockResponse);
+    expect(result.confirmableItems).toHaveLength(1);
+    expect(result.confirmableItems[0].type).toBe("inference");
+    expect(result.confirmableItems[0].status).toBe("pending");
+  });
+
+  it("parseResumeTailorResult 应在缺少 confirmableItems 时返回空数组", () => {
+    const mockResponse = JSON.stringify({
+      content: { zh: "中文", en: "English" },
+      provenance: [],
+      matchAnalysis: { matchScore: 70, matchDetails: [], gapAnalysis: "" },
+      aiFlavorScore: 0,
+    });
+    const result = parseResumeTailorResult(mockResponse);
+    expect(result.confirmableItems).toEqual([]);
+  });
+});

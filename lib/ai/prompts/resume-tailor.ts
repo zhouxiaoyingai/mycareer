@@ -5,7 +5,9 @@
 
 import { injectAntiHallucinationRules } from "./shared/anti-hallucination";
 import { PROVENANCE_PROMPT_FRAGMENT } from "./shared/provenance-rules";
+import { CONFIRMABLE_ITEMS_PROMPT_FRAGMENT } from "./shared/confirmable-items";
 import type { ResumeContent } from "@/types/resume";
+import type { ConfirmableItem } from "@/types/jd";
 
 export interface ResumeTailorInput {
   standardContent: ResumeContent;
@@ -72,11 +74,23 @@ export const RESUME_TAILOR_SYSTEM_PROMPT = injectAntiHallucinationRules(
     ],
     "gapAnalysis": "缺失 Kubernetes 相关经验，建议补充容器化项目经历"
   },
-  "aiFlavorScore": 0
+  "aiFlavorScore": 0,
+  "confirmableItems": [
+    {
+      "field": "experiences[0].bullets[0]",
+      "type": "inference",
+      "originalText": "参与了项目开发",
+      "inferredText": "主导了项目开发",
+      "question": "原文是'参与了项目开发'，是否升级为'主导了项目开发'？",
+      "options": ["接受推断", "保留原文", "自定义"]
+    }
+  ]
 }
 \`\`\`
 
 ${PROVENANCE_PROMPT_FRAGMENT}
+
+${CONFIRMABLE_ITEMS_PROMPT_FRAGMENT}
 
 ## 禁止行为
 - 编造 JD 提到但简历没有的经历
@@ -135,6 +149,7 @@ export interface ResumeTailorResult {
     gapAnalysis: string;
   };
   aiFlavorScore: number;
+  confirmableItems: ConfirmableItem[];
 }
 
 export function parseResumeTailorResult(raw: string): ResumeTailorResult {
@@ -155,6 +170,20 @@ export function parseResumeTailorResult(raw: string): ResumeTailorResult {
         gapAnalysis: parsed.matchAnalysis?.gapAnalysis ?? "",
       },
       aiFlavorScore: typeof parsed.aiFlavorScore === "number" ? parsed.aiFlavorScore : 0,
+      confirmableItems: Array.isArray(parsed.confirmableItems)
+        ? parsed.confirmableItems.map((item: Record<string, unknown>, index: number) => ({
+            id: typeof item.id === "string" ? item.id : `ci_${Date.now()}_${index}`,
+            field: typeof item.field === "string" ? item.field : "",
+            type: (["inference", "placeholder", "quantification", "keyword_align"].includes(
+              item.type as string,
+            ) ? item.type : "inference") as ConfirmableItem["type"],
+            originalText: typeof item.originalText === "string" ? item.originalText : "",
+            inferredText: typeof item.inferredText === "string" ? item.inferredText : "",
+            question: typeof item.question === "string" ? item.question : "",
+            options: Array.isArray(item.options) ? item.options : ["接受推断", "保留原文", "自定义"],
+            status: "pending" as const,
+          }))
+        : [],
     };
   } catch (err) {
     throw new Error(`简历定制结果解析失败: ${err instanceof Error ? err.message : String(err)}`);
