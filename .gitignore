@@ -43,3 +43,8 @@ awesome-design-md/
 .vscode/
 *.swp
 *.swo
+
+# 含敏感信息的本地文档（CloudBase SecretKey 等）
+操作流程记录.md
+初始需求.md
+docs/full-session-log-*.md
