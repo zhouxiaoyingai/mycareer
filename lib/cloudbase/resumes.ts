@@ -94,6 +94,11 @@ export interface UpdateResumeInput {
   status?: ResumeStatus;
   targetRole?: string;
   rawContent?: string;
+  // tailored 扩展字段
+  jdId?: string;
+  matchAnalysis?: import("@/types/jd").MatchAnalysis;
+  confirmableItems?: import("@/types/jd").ConfirmableItem[];
+  confirmCompleted?: boolean;
 }
 
 export async function updateResume(

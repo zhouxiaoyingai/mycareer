@@ -2,8 +2,10 @@
  * 简历相关类型定义
  */
 
+import type { MatchAnalysis, ConfirmableItem } from "./jd";
+
 /** 简历类型 */
-export type ResumeType = "standard" | "tailored";
+export type ResumeType = "master" | "standard" | "tailored";
 
 /** 简历来源类型 */
 export type ResumeSourceType =
@@ -19,7 +21,9 @@ export type ResumeStatus =
   | "parsed"
   | "generating"
   | "completed"
-  | "failed";
+  | "failed"
+  | "confirmed"
+  | "archived";
 
 /** 幻觉风险等级 */
 export type HallucinationRisk = "low" | "medium" | "high";
@@ -124,8 +128,9 @@ export interface Resume {
   status: ResumeStatus;
   // 阶段3新增：JD 关联与待确认项
   jdId?: string;
-  matchAnalysis?: import("./jd").MatchAnalysis;
-  confirmableItems?: import("./jd").ConfirmableItem[];
+  matchAnalysis?: MatchAnalysis;
+  confirmableItems?: ConfirmableItem[];
+  confirmCompleted?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -21,12 +21,20 @@ const statusVariants: Record<
   "default" | "secondary" | "outline" | "success" | "warning"
 > = {
   draft: "warning",
+  parsed: "secondary",
+  generating: "warning",
+  completed: "success",
+  failed: "outline",
   confirmed: "success",
   archived: "secondary",
 };
 
 const statusLabels: Record<ResumeStatus, string> = {
   draft: "草稿",
+  parsed: "已解析",
+  generating: "生成中",
+  completed: "已完成",
+  failed: "失败",
   confirmed: "已确认",
   archived: "已归档",
 };

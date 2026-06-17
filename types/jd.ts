@@ -15,7 +15,7 @@ export interface JdSkill {
 /** JD 结构化数据 */
 export interface JdStructured {
   title: string;
-  company: string;
+  company?: string;
   location?: string;
   employmentType?: string; // 全职/兼职/实习
   experienceLevel?: string; // 初级/中级/高级/专家
@@ -84,7 +84,7 @@ export interface JdListItem {
   status: JdStatus;
   targetRole?: string;
   structuredTitle: string;
-  structuredCompany: string;
+  structuredCompany?: string;
   createdAt: Date;
   updatedAt: Date;
 }

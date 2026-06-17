@@ -27,7 +27,7 @@ const createSchema = z.object({
   sourceFileId: z.string().optional(),
   targetRole: z.string().optional(),
   parentId: z.string().optional(),
-  status: z.enum(["draft", "confirmed", "archived"]).optional(),
+  status: z.enum(["draft", "parsed", "generating", "completed", "failed", "confirmed", "archived"]).optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     const limitParam = searchParams.get("limit");
 
     const validTypes: ResumeType[] = ["master", "standard", "tailored"];
-    const validStatuses: ResumeStatus[] = ["draft", "confirmed", "archived"];
+    const validStatuses: ResumeStatus[] = ["draft", "parsed", "generating", "completed", "failed", "confirmed", "archived"];
 
     if (type && !validTypes.includes(type)) {
       return validationErrorResponse(`无效的 type 参数: ${type}`);

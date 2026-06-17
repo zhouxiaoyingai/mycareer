@@ -8,7 +8,9 @@ export type ErrorCode =
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
   | "CONFLICT"
-  | "INTERNAL_ERROR";
+  | "INTERNAL_ERROR"
+  | "AI_PARSE_ERROR"
+  | "FILE_UPLOAD_ERROR";
 
 export interface ApiSuccessResponse<T> {
   data: T;

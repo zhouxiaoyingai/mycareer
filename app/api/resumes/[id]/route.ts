@@ -26,7 +26,7 @@ const updateSchema = z.object({
     .optional(),
   provenance: z.array(z.object({}).passthrough()).optional(),
   aiFlavorScore: z.number().optional(),
-  status: z.enum(["draft", "confirmed", "archived"]).optional(),
+  status: z.enum(["draft", "parsed", "generating", "completed", "failed", "confirmed", "archived"]).optional(),
   targetRole: z.string().optional(),
   rawContent: z.string().optional(),
 });
