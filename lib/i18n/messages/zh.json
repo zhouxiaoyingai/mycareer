@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "求职助手",
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "confirm": "确认",
+    "back": "返回"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "logout": "登出",
+    "email": "邮箱",
+    "password": "密码",
+    "displayName": "昵称",
+    "loginTitle": "登录求职助手",
+    "registerTitle": "创建账号",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已有账号？",
+    "loginNow": "立即登录",
+    "registerNow": "立即注册",
+    "emailPlaceholder": "请输入邮箱",
+    "passwordPlaceholder": "请输入密码",
+    "displayNamePlaceholder": "请输入昵称",
+    "loginSuccess": "登录成功",
+    "registerSuccess": "注册成功",
+    "loginFailed": "登录失败",
+    "registerFailed": "注册失败"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "resume": "简历",
+    "jd": "岗位匹配",
+    "greeting": "打招呼",
+    "interview": "模拟面试",
+    "applications": "投递记录"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "welcome": "欢迎回来，{name}",
+    "resumeCount": "简历数量",
+    "jdCount": "JD 数量",
+    "interviewCount": "面试练习",
+    "applicationCount": "投递记录",
+    "quickActions": "快捷操作",
+    "uploadResume": "上传简历",
+    "pasteJD": "粘贴 JD",
+    "startInterview": "开始面试"
+  }
+}

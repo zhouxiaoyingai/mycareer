@@ -1,0 +1,29 @@
+=== icube_session_agent_map ===
+Length: 40 chars
+Content:
+{"6a31ffb522fb53caae753f65":"dev_agent"}
+
+=== All sessionRelation keys ===
+Key: 3436399573600554_ai-chat:sessionRelation:modelMap
+Value: {"6a31ffb522fb53caae753f65":{"dev_builder":"1_-_glm-5.2"}}
+
+Key: 3436399573600554_ai-chat:sessionRelation:modeMap
+Value: {}
+
+Key: 3436399573600554_ai-chat:sessionRelation:globalModelMap
+Value: {"dev_builder":"1_-_glm-5.2"}
+
+Key: 3436399573600554_ai-chat:sessionRelation:globalModeMap
+Value: {"dev_builder":0}
+
+Key: 3436399573600554_ai-chat:sessionRelation:migrationCompleted
+Value: true
+
+=== ChatStore session IDs ===
+State keys: ['turnsHeight', 'turnsIsExpand', 'diffCodeBlockStatus']
+Number of turns: 16
+Unique session IDs:
+  - 6a3206350c9aa92d812bfd09
+  - 6a320fba0c9aa92d812bfd0a
+  - 6a3210a90c9aa92d812bfd0b
+  - 6a32111f0c9aa92d812bfd0c

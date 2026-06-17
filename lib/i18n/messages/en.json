@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "MyCareer",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display Name",
+    "loginTitle": "Log in to MyCareer",
+    "registerTitle": "Create Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginNow": "Log in",
+    "registerNow": "Sign up",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "displayNamePlaceholder": "Enter your display name",
+    "loginSuccess": "Logged in successfully",
+    "registerSuccess": "Account created successfully",
+    "loginFailed": "Login failed",
+    "registerFailed": "Registration failed"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "resume": "Resume",
+    "jd": "Job Match",
+    "greeting": "Greeting",
+    "interview": "Mock Interview",
+    "applications": "Applications"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {name}",
+    "resumeCount": "Resumes",
+    "jdCount": "Job Descriptions",
+    "interviewCount": "Interview Practices",
+    "applicationCount": "Applications",
+    "quickActions": "Quick Actions",
+    "uploadResume": "Upload Resume",
+    "pasteJD": "Paste JD",
+    "startInterview": "Start Interview"
+  }
+}

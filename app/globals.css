@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 浅色友好风 - Notion/Airbnb 启发 */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 217 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 60 10% 96%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 60 10% 96%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 60 10% 96%;
+    --accent-foreground: 0 0% 12%;
+    --destructive: 14 100% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 60 6% 90%;
+    --input: 60 6% 90%;
+    --ring: 217 100% 50%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
