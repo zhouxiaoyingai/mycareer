@@ -104,6 +104,13 @@ export interface ResumeContent {
   en: string;
 }
 
+/** 打招呼短文（嵌入定制简历） */
+export interface Greeting {
+  text: string;           // 打招呼短文（50-100字）
+  generatedAt: Date;      // 生成时间
+  version: number;        // 版本号，重新生成时 +1
+}
+
 /** 生成标准简历的选项 */
 export interface GenerateStandardOptions {
   templateStyle: "star" | "project" | "skill" | "mixed";
@@ -131,6 +138,8 @@ export interface Resume {
   matchAnalysis?: MatchAnalysis;
   confirmableItems?: ConfirmableItem[];
   confirmCompleted?: boolean;
+  // 阶段4新增：打招呼短文（仅 tailored 类型简历）
+  greeting?: Greeting;
   createdAt: Date;
   updatedAt: Date;
 }

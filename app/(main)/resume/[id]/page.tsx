@@ -19,6 +19,7 @@ import {
   countPlaceholders,
   estimatePages,
 } from "@/lib/utils/markdown";
+import { GreetingCard } from "@/components/resume/greeting-card";
 import type { ResumeType, ResumeStatus } from "@/types/resume";
 
 export const dynamic = "force-dynamic";
@@ -179,6 +180,14 @@ export default async function ResumeDetailPage({
             </CardContent>
           </Card>
         )}
+
+      {resume.type === "tailored" && resume.greeting && (
+        <GreetingCard
+          resumeId={resume._id}
+          greeting={resume.greeting}
+          showRegenerate={true}
+        />
+      )}
 
       {hasContent ? (
         <Tabs defaultValue="zh" className="w-full">

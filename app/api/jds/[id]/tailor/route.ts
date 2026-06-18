@@ -95,6 +95,13 @@ export async function POST(
       matchAnalysis: result.matchAnalysis,
       confirmableItems: result.confirmableItems,
       confirmCompleted: result.confirmableItems.length === 0,
+      greeting: result.greeting
+        ? {
+            text: result.greeting.text,
+            generatedAt: new Date(),
+            version: 1,
+          }
+        : undefined,
     });
 
     return successResponse({
@@ -110,6 +117,12 @@ export async function POST(
         en: enPlaceholders,
         total: zhPlaceholders + enPlaceholders,
       },
+      greeting: result.greeting
+        ? {
+            text: result.greeting.text,
+            version: 1,
+          }
+        : null,
       usage: aiResponse.usage,
     });
   } catch (error) {

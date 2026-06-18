@@ -268,4 +268,38 @@ describe("resume-tailor 提示词（含待确认项）", () => {
     const result = parseResumeTailorResult(mockResponse);
     expect(result.confirmableItems).toEqual([]);
   });
+
+  it("parseResumeTailorResult 应解析 greeting 字段", () => {
+    const mockResponse = JSON.stringify({
+      content: { zh: "中文简历", en: "English resume" },
+      provenance: [],
+      matchAnalysis: { matchScore: 80, matchDetails: [], gapAnalysis: "无差距" },
+      aiFlavorScore: 0,
+      confirmableItems: [],
+      greeting: {
+        text: "您好，我是有5年前端经验的工程师，熟悉 React 和 TypeScript，与贵司岗位高度匹配。",
+      },
+    });
+    const result = parseResumeTailorResult(mockResponse);
+    expect(result.greeting).toBeDefined();
+    expect(result.greeting!.text).toContain("您好");
+    expect(result.greeting!.text.length).toBeGreaterThan(20);
+  });
+
+  it("parseResumeTailorResult 应在缺少 greeting 时降级为 undefined", () => {
+    const mockResponse = JSON.stringify({
+      content: { zh: "中文", en: "English" },
+      provenance: [],
+      matchAnalysis: { matchScore: 70, matchDetails: [], gapAnalysis: "" },
+      aiFlavorScore: 0,
+      confirmableItems: [],
+    });
+    const result = parseResumeTailorResult(mockResponse);
+    expect(result.greeting).toBeUndefined();
+  });
+
+  it("系统提示词应包含打招呼短文生成要求", () => {
+    expect(RESUME_TAILOR_SYSTEM_PROMPT).toContain("打招呼短文");
+    expect(RESUME_TAILOR_SYSTEM_PROMPT).toContain("50-100");
+  });
 });

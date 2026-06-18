@@ -99,6 +99,8 @@ export interface UpdateResumeInput {
   matchAnalysis?: import("@/types/jd").MatchAnalysis;
   confirmableItems?: import("@/types/jd").ConfirmableItem[];
   confirmCompleted?: boolean;
+  // 阶段4新增：打招呼短文
+  greeting?: import("@/types/resume").Greeting;
 }
 
 export async function updateResume(

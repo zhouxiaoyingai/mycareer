@@ -8,7 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { GreetingCard } from "@/components/resume/greeting-card";
 import type { ConfirmableItem } from "@/types/jd";
+import type { Greeting } from "@/types/resume";
 
 export default function ConfirmPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function ConfirmPage({ params }: { params: { id: string } }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [customTexts, setCustomTexts] = useState<Record<string, string>>({});
+  const [greeting, setGreeting] = useState<Greeting | undefined>(undefined);
 
   useEffect(() => {
     const fetchResume = async () => {
@@ -25,6 +28,7 @@ export default function ConfirmPage({ params }: { params: { id: string } }) {
         if (!response.ok) throw new Error("加载失败");
         const data = await response.json();
         setItems(data.data.confirmableItems || []);
+        setGreeting(data.data.greeting);
       } catch (err) {
         setError(err instanceof Error ? err.message : "加载失败");
       } finally {
@@ -114,6 +118,14 @@ export default function ConfirmPage({ params }: { params: { id: string } }) {
           </p>
         </div>
       </div>
+
+      {greeting && (
+        <GreetingCard
+          resumeId={params.id}
+          greeting={greeting}
+          showRegenerate={false}
+        />
+      )}
 
       {items.length === 0 ? (
         <Card>

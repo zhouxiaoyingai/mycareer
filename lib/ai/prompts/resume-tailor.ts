@@ -88,6 +88,25 @@ export const RESUME_TAILOR_SYSTEM_PROMPT = injectAntiHallucinationRules(
 }
 \`\`\`
 
+## 打招呼短文（greeting 字段）
+基于 matchAnalysis 生成一段 50-100 字的中文打招呼短文，用于私信招聘方。
+要求：
+1. 突出用户核心优势（2-3个，来自简历内容）
+2. 突出与 JD 的匹配点（2-3个，来自 matchAnalysis.matchDetails 中 status 为 matched 的项）
+3. 字数严格 50-100 字
+4. 语气自然、专业、引起兴趣，避免过度自夸
+5. 禁止使用 AI 味词（赋能/打造/夯实等）
+6. 不可编造简历中不存在的能力
+
+输出格式（在 JSON 中新增 greeting 字段）：
+\`\`\`json
+{
+  "greeting": {
+    "text": "您好，我是有5年前端经验的工程师，熟悉 React 和 TypeScript，曾主导多个大型项目。注意到贵司岗位要求 React 经验，与我的背景高度匹配，期待进一步沟通。"
+  }
+}
+\`\`\`
+
 ${PROVENANCE_PROMPT_FRAGMENT}
 
 ${CONFIRMABLE_ITEMS_PROMPT_FRAGMENT}
@@ -150,6 +169,9 @@ export interface ResumeTailorResult {
   };
   aiFlavorScore: number;
   confirmableItems: ConfirmableItem[];
+  greeting?: {
+    text: string;  // 50-100字中文打招呼短文
+  };
 }
 
 export function parseResumeTailorResult(raw: string): ResumeTailorResult {
@@ -184,6 +206,10 @@ export function parseResumeTailorResult(raw: string): ResumeTailorResult {
             status: "pending" as const,
           }))
         : [],
+      greeting:
+        parsed.greeting && typeof parsed.greeting.text === "string"
+          ? { text: parsed.greeting.text }
+          : undefined,
     };
   } catch (err) {
     throw new Error(`简历定制结果解析失败: ${err instanceof Error ? err.message : String(err)}`);
