@@ -142,3 +142,40 @@ export async function listTailoredByStandard(
     updatedAt: r.updatedAt,
   }));
 }
+
+/**
+ * 打招呼话术列表项
+ */
+export interface GreetingListItem {
+  resumeId: string;
+  targetRole?: string;
+  jdId?: string;
+  matchScore?: number;
+  greeting: import("@/types/resume").Greeting;
+  updatedAt: Date;
+}
+
+/**
+ * 查询用户所有打招呼话术（来自 tailored 简历）
+ * 按 greeting.generatedAt 倒序返回
+ */
+export async function listGreetingsByUser(
+  userId: string,
+): Promise<GreetingListItem[]> {
+  const resumes = await findMany<Resume>(
+    Collections.RESUMES,
+    { userId, type: "tailored" },
+    { orderBy: { field: "updatedAt", direction: "desc" }, limit: 100 },
+  );
+
+  return resumes
+    .filter((r) => r.greeting && r.greeting.text)
+    .map((r) => ({
+      resumeId: r._id,
+      targetRole: r.targetRole,
+      jdId: r.jdId,
+      matchScore: r.matchAnalysis?.matchScore,
+      greeting: r.greeting!,
+      updatedAt: r.updatedAt,
+    }));
+}

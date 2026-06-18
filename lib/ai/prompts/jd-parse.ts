@@ -36,8 +36,8 @@ export const JD_PARSE_SYSTEM_PROMPT = `你是一个专业的职位描述（JD）
 \`\`\`json
 {
   "title": "string",
-  "company": "string | undefined",
-  "location": "string | undefined",
+  "company": "string（可选，JD 未提及则留空字符串）",
+  "location": "string（可选，JD 未提及则留空字符串）",
   "employmentType": "全职 | 兼职 | 实习",
   "experienceLevel": "初级 | 中级 | 高级 | 专家",
   "hardSkills": [
@@ -57,6 +57,8 @@ export const JD_PARSE_SYSTEM_PROMPT = `你是一个专业的职位描述（JD）
 
 ## 注意事项
 - 输出必须是合法 JSON
+- 所有字段必须存在，未提及的字段使用空字符串 "" 或空数组 []
+- 严禁输出 undefined、null 等 JS 值，未提及的字段一律用空字符串
 - 技能名称统一规范化（如 "js" → "JavaScript"）
 - 不可编造 JD 中未提及的技能
 - 权重基于 JD 中的措辞强度判定`;
@@ -97,11 +99,15 @@ export interface JdParseResult {
 export function parseJdParseResult(raw: string): JdParseResult {
   try {
     const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    const parsed = JSON.parse(cleaned);
+    // 防御性处理：AI 可能输出 undefined/null 等 JS 值，替换为空字符串
+    const sanitized = cleaned
+      .replace(/:\s*undefined\s*([,}])/g, ': ""$1')
+      .replace(/:\s*null\s*([,}])/g, ': ""$1');
+    const parsed = JSON.parse(sanitized);
     return {
       title: parsed.title ?? "",
-      company: parsed.company,
-      location: parsed.location,
+      company: parsed.company || undefined,
+      location: parsed.location || undefined,
       employmentType: parsed.employmentType ?? "全职",
       experienceLevel: parsed.experienceLevel ?? "中级",
       hardSkills: Array.isArray(parsed.hardSkills) ? parsed.hardSkills : [],
