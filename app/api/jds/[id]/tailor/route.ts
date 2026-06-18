@@ -95,6 +95,7 @@ export async function POST(
       matchAnalysis: result.matchAnalysis,
       confirmableItems: result.confirmableItems,
       confirmCompleted: result.confirmableItems.length === 0,
+      status: "completed",
       greeting: result.greeting
         ? {
             text: result.greeting.text,

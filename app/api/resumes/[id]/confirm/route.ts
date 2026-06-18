@@ -66,6 +66,7 @@ export async function POST(
     await updateResume(params.id, session.userId, {
       confirmableItems: updatedItems,
       confirmCompleted,
+      status: "completed",
     });
 
     return successResponse({

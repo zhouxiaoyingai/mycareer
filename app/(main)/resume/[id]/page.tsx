@@ -190,7 +190,7 @@ export default async function ResumeDetailPage({
         />
       )}
 
-      {resume.type === "tailored" && resume.status === "completed" && (
+      {resume.type === "tailored" && resume.confirmCompleted && (
         <Card>
           <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
             <div className="flex items-center gap-3">
