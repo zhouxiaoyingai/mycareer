@@ -1,0 +1,10 @@
+{
+  "name": "mycareer",
+  "build": {
+    "command": "npm run build",
+    "outputDir": ".next"
+  },
+  "env": {
+    "NODE_VERSION": "18"
+  }
+}
