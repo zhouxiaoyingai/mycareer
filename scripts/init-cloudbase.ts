@@ -43,6 +43,10 @@ const COLLECTIONS = [
     description: "面试表",
   },
   {
+    name: "interview_sessions",
+    description: "面试答题会话表",
+  },
+  {
     name: "applications",
     description: "投递记录表",
   },
