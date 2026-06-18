@@ -1,8 +1,8 @@
-import cloudbase from "@cloudbase/node-sdk";
+import cloudbase, { CloudBase } from "@cloudbase/node-sdk";
 
-let app: cloudbase.app.App | null = null;
+let app: CloudBase | null = null;
 
-export function getCloudBaseApp(): cloudbase.app.App {
+export function getCloudBaseApp(): CloudBase {
   if (app) {
     return app;
   }
@@ -27,6 +27,7 @@ export function getCloudBaseApp(): cloudbase.app.App {
   return app;
 }
 
-export function getDb(): cloudbase.database.Db {
+// 使用 ReturnType 获取 SDK 真实的 database() 返回类型
+export function getDb(): ReturnType<CloudBase["database"]> {
   return getCloudBaseApp().database();
 }
