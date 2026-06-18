@@ -10,6 +10,7 @@ import {
   Sparkles,
   AlertTriangle,
   CheckCircle2,
+  Mic,
 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -187,6 +188,28 @@ export default async function ResumeDetailPage({
           greeting={resume.greeting}
           showRegenerate={true}
         />
+      )}
+
+      {resume.type === "tailored" && resume.status === "completed" && (
+        <Card>
+          <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
+            <div className="flex items-center gap-3">
+              <Mic className="h-5 w-5 text-primary" />
+              <div>
+                <p className="font-medium">生成模拟面试题</p>
+                <p className="text-sm text-muted-foreground">
+                  基于此定制简历和关联 JD，生成 8 道针对性面试题
+                </p>
+              </div>
+            </div>
+            <Link href={`/interview?resumeId=${resume._id}&action=new`}>
+              <Button>
+                <Mic className="h-4 w-4 mr-2" />
+                生成面试题
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       )}
 
       {hasContent ? (

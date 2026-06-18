@@ -11,6 +11,7 @@ import {
   Briefcase,
   MapPin,
   Building2,
+  Mic,
 } from "lucide-react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
@@ -126,6 +127,30 @@ export default async function JdDetailPage({
               <Button>
                 <Sparkles className="h-4 w-4 mr-2" />
                 生成定制简历
+              </Button>
+            </Link>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
+          <div className="flex items-center gap-3">
+            <Mic className="h-5 w-5 text-primary" />
+            <div>
+              <p className="font-medium">生成模拟面试题</p>
+              <p className="text-sm text-muted-foreground">
+                基于此 JD 和简历，生成 8 道针对性面试题并支持答题演练
+              </p>
+            </div>
+          </div>
+          {standardResumes.length === 0 ? (
+            <p className="text-sm text-orange-600">请先创建并确认标准版简历</p>
+          ) : (
+            <Link href={`/interview?jdId=${jd._id}&action=new`}>
+              <Button>
+                <Mic className="h-4 w-4 mr-2" />
+                生成面试题
               </Button>
             </Link>
           )}
