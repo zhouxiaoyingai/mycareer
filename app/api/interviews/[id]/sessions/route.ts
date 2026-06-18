@@ -1,0 +1,65 @@
+import { NextRequest } from "next/server";
+import { requireAuth } from "@/lib/cloudbase/auth";
+import { getInterviewById } from "@/lib/cloudbase/interviews";
+import { createSession, listSessionsByInterview } from "@/lib/cloudbase/interview-sessions";
+import {
+  successResponse,
+  unauthorizedResponse,
+  internalErrorResponse,
+  errorResponse,
+} from "@/lib/utils/response";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const session = await requireAuth();
+    const interview = await getInterviewById(params.id, session.userId);
+    if (!interview) return errorResponse("NOT_FOUND", "面试题集不存在或无权访问", 404);
+
+    const sessions = await listSessionsByInterview(params.id, session.userId);
+    const sessionsWithTotal = sessions.map((s) => ({
+      ...s,
+      totalQuestions: interview.questions.length,
+    }));
+
+    return successResponse({ sessions: sessionsWithTotal });
+  } catch (error) {
+    console.error("获取会话列表失败:", error);
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return unauthorizedResponse();
+    }
+    return internalErrorResponse(
+      `获取会话列表失败: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
+
+export async function POST(
+  _request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const session = await requireAuth();
+    const interview = await getInterviewById(params.id, session.userId);
+    if (!interview) return errorResponse("NOT_FOUND", "面试题集不存在或无权访问", 404);
+
+    const newSession = await createSession({
+      userId: session.userId,
+      interviewId: params.id,
+    });
+
+    return successResponse({ session: newSession }, 201);
+  } catch (error) {
+    console.error("创建答题会话失败:", error);
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return unauthorizedResponse();
+    }
+    return internalErrorResponse(
+      `创建答题会话失败: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
