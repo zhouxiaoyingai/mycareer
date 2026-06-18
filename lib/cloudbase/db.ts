@@ -6,6 +6,7 @@ export const Collections = {
   JDS: "jds",
   GREETINGS: "greetings",
   INTERVIEWS: "interviews",
+  INTERVIEW_SESSIONS: "interview_sessions",
   APPLICATIONS: "applications",
 } as const;
 
