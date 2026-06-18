@@ -63,7 +63,7 @@ export default async function JdDetailPage({
 
   const standardResumes = await listResumesByUser(session.userId, {
     type: "standard",
-    status: "confirmed",
+    status: "completed",
   });
   const deleteAction = handleDelete.bind(null, params.id, session.userId);
 

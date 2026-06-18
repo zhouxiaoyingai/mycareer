@@ -87,11 +87,12 @@ export async function POST(request: NextRequest) {
       status: "draft",
     });
 
-    // 更新 standard 简历的 content/provenance/aiFlavorScore
+    // 更新 standard 简历的 content/provenance/aiFlavorScore，状态置为 completed
     await updateResume(standardResume._id, session.userId, {
       content: result.content,
       provenance: result.provenance,
       aiFlavorScore,
+      status: "completed",
     });
 
     return successResponse({

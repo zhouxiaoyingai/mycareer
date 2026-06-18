@@ -31,7 +31,7 @@ export default function TailorPage({ params }: { params: { id: string } }) {
     const fetchResumes = async () => {
       try {
         const response = await fetch(
-          "/api/resumes?type=standard&status=confirmed",
+          "/api/resumes?type=standard&status=completed",
         );
         if (!response.ok) throw new Error("获取标准版简历失败");
         const data = await response.json();

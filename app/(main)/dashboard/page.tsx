@@ -4,16 +4,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FileText, Briefcase, Mic, Send, Upload, ClipboardPaste, Play } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await getCurrentUser();
+  if (!session) redirect("/login");
   const t = await getTranslations("dashboard");
 
   const [resumes, jds, interviews, applications] = await Promise.all([
-    findMany(Collections.RESUMES, { userId: session!.userId }),
-    findMany(Collections.JDS, { userId: session!.userId }),
-    findMany(Collections.INTERVIEWS, { userId: session!.userId }),
-    findMany(Collections.APPLICATIONS, { userId: session!.userId }),
+    findMany(Collections.RESUMES, { userId: session.userId }),
+    findMany(Collections.JDS, { userId: session.userId }),
+    findMany(Collections.INTERVIEWS, { userId: session.userId }),
+    findMany(Collections.APPLICATIONS, { userId: session.userId }),
   ]);
 
   const stats = [
