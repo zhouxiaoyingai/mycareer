@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Briefcase, MessageSquare, Mic, Send } from "lucide-react";
+import { LayoutDashboard, FileText, Briefcase, MessageSquare, Mic, Send, Compass } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useTranslations } from "next-intl";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, key: "dashboard" },
+  { href: "/discover", icon: Compass, key: "discover" },
   { href: "/resume", icon: FileText, key: "resume" },
   { href: "/jd", icon: Briefcase, key: "jd" },
   { href: "/greeting", icon: MessageSquare, key: "greeting" },
