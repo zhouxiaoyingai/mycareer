@@ -8,6 +8,7 @@ export const Collections = {
   INTERVIEWS: "interviews",
   INTERVIEW_SESSIONS: "interview_sessions",
   APPLICATIONS: "applications",
+  STRENGTH_REPORTS: "strength_reports",
 } as const;
 
 export async function insertOne<T extends Record<string, unknown>>(
