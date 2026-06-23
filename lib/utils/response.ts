@@ -25,3 +25,7 @@ export function validationErrorResponse(message: string, details?: Record<string
 export function internalErrorResponse(message = "服务器内部错误"): NextResponse<ApiErrorResponse> {
   return errorResponse("INTERNAL_ERROR", message, 500);
 }
+
+export function notFoundResponse(message = "资源不存在"): NextResponse<ApiErrorResponse> {
+  return errorResponse("NOT_FOUND", message, 404);
+}

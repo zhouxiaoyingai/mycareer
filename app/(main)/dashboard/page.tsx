@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/cloudbase/auth";
 import { findMany, Collections } from "@/lib/cloudbase/db";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, Briefcase, Mic, Send, Upload, ClipboardPaste, Play } from "lucide-react";
+import { DashboardWidget } from "@/components/discover/dashboard-widget";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
 
   const quickActions = [
     { label: t("uploadResume"), href: "/resume/upload", icon: Upload },
-    { label: t("pasteJD"), href: "/jd/input", icon: ClipboardPaste },
+    { label: t("pasteJD"), href: "/jd/new", icon: ClipboardPaste },
     { label: t("startInterview"), href: "/interview", icon: Play },
   ];
 
@@ -58,6 +59,9 @@ export default async function DashboardPage() {
           );
         })}
       </div>
+
+      {/* Strength Discovery Widget */}
+      <DashboardWidget />
 
       <div>
         <h2 className="text-lg font-semibold mb-3">{t("quickActions")}</h2>

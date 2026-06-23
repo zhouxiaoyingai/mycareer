@@ -50,6 +50,10 @@ const COLLECTIONS = [
     name: "applications",
     description: "投递记录表",
   },
+  {
+    name: "strength_reports",
+    description: "优势识别报告表",
+  },
 ];
 
 async function main() {
