@@ -677,6 +677,14 @@ export default function DiscoverPage() {
   if (pageState === "idle") {
     return (
       <div className="max-w-2xl mx-auto py-12">
+        <PrefillBanner
+          onApply={(data) => {
+            setAnswers((prev) => ({
+              ...prev,
+              yearsOfExperience: data.yearsOfExperience,
+            }));
+          }}
+        />
         <Card className="text-center py-12">
           <CardContent>
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
