@@ -48,3 +48,9 @@ awesome-design-md/
 操作流程记录.md
 初始需求.md
 docs/full-session-log-*.md
+
+# 临时构建/部署产物
+build.tmp.*
+deploy.log
+deploy/*.tgz
+.worktrees/
