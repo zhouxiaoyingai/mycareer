@@ -1,7 +1,0 @@
-#!/bin/bash
-# CloudBase HTTP 云函数启动脚本
-# 端口必须是 9000（CloudBase 硬性要求）
-export PORT=9000
-export HOSTNAME=0.0.0.0
-export NODE_ENV=production
-node .next/standalone/server.js
