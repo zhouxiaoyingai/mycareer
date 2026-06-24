@@ -75,7 +75,7 @@ function InterviewListContent() {
       }
 
       const json = await response.json();
-      const newId = json.data.interview._id;
+      const newId = json.data.interview.id;
       // 清除 URL 参数，避免刷新重复触发
       router.replace("/interview");
       // 跳转到题集详情页
@@ -199,60 +199,60 @@ function InterviewListContent() {
       ) : (
         <div className="space-y-4">
           {interviews.map((item) => (
-            <Card key={item._id} className="hover:shadow-md transition-shadow">
+            <Card key={item.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
-                    {item.jdTitle}
+                    {item.jd_title}
                   </CardTitle>
                   <div className="flex items-center gap-2">
-                    {item.bestScore !== undefined && (
+                    {item.best_score !== undefined && (
                       <Badge variant="success">
                         <Trophy className="h-3 w-3 mr-1" />
-                        最高 {item.bestScore}
+                        最高 {item.best_score}
                       </Badge>
                     )}
                     <Badge variant="outline">
-                      演练 {item.sessionCount} 次
+                      演练 {item.session_count} 次
                     </Badge>
                     <Badge variant="secondary">
-                      {item.questionCount} 题
+                      {item.question_count} 题
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {item.questionTypes.map((t) => (
+                  {item.question_types.map((t) => (
                     <Badge key={t} variant="outline">
                       {questionTypeLabels[t]}
                     </Badge>
                   ))}
-                  {item.jdCompany && (
+                  {item.jd_company && (
                     <span className="text-xs text-muted-foreground self-center">
-                      {item.jdCompany}
+                      {item.jd_company}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">
-                    更新于 {new Date(item.updatedAt).toLocaleString("zh-CN")}
+                    更新于 {new Date(item.updated_at).toLocaleString("zh-CN")}
                   </p>
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      onClick={() => router.push(`/interview/${item._id}`)}
+                      onClick={() => router.push(`/interview/${item.id}`)}
                     >
                       查看详情
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleDelete(item._id)}
-                      disabled={deletingId === item._id}
+                      onClick={() => handleDelete(item.id)}
+                      disabled={deletingId === item.id}
                     >
-                      {deletingId === item._id ? (
+                      {deletingId === item.id ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                       ) : (
                         <Trash2 className="h-3 w-3" />

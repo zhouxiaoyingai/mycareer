@@ -71,7 +71,7 @@ export async function createInterview(
 export async function updateInterview(
   userId: string,
   id: string,
-  patch: Partial<Pick<Interview, "status" | "questions" | "questionTypes">>
+  patch: Partial<Pick<Interview, "status" | "questions" | "question_types">>
 ): Promise<Interview> {
   const supabase = await createClient();
   const { data, error } = await supabase

@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/lib/cloudbase/auth";
-import { getResumeById } from "@/lib/cloudbase/resumes";
+import { getCurrentUser } from "@/lib/supabase/auth";
+import { getResumeById } from "@/lib/supabase/db/resumes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -69,15 +69,15 @@ export default async function ResumeDetailPage({
     notFound();
   }
 
-  const hasContent = Boolean(resume.content?.zh || resume.content?.en);
-  const zhPlaceholders = resume.content?.zh
-    ? detectPlaceholders(resume.content.zh)
+  const hasContent = Boolean(resume.raw_content);
+  const zhPlaceholders = resume.raw_content
+    ? detectPlaceholders(resume.raw_content)
     : [];
-  const enPlaceholders = resume.content?.en
-    ? detectPlaceholders(resume.content.en)
+  const enPlaceholders = resume.raw_content
+    ? detectPlaceholders(resume.raw_content)
     : [];
-  const zhPages = resume.content?.zh ? estimatePages(resume.content.zh) : 0;
-  const enPages = resume.content?.en ? estimatePages(resume.content.en) : 0;
+  const zhPages = resume.raw_content ? estimatePages(resume.raw_content) : 0;
+  const enPages = resume.raw_content ? estimatePages(resume.raw_content) : 0;
 
   const reviewableProvenance = resume.provenance.filter(
     (p) => p.hallucinationRisk !== "low",
@@ -94,7 +94,7 @@ export default async function ResumeDetailPage({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">
-              {resume.targetRole || typeLabels[resume.type]}
+              {resume.target_role || typeLabels[resume.type]}
             </h1>
             <Badge variant={statusVariants[resume.status]}>
               {statusLabels[resume.status]}
@@ -102,7 +102,7 @@ export default async function ResumeDetailPage({
           </div>
           <p className="text-sm text-muted-foreground mt-1">
             {typeLabels[resume.type]} · 更新于{" "}
-            {new Date(resume.updatedAt).toLocaleDateString("zh-CN")}
+            {new Date(resume.updated_at).toLocaleDateString("zh-CN")}
           </p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default async function ResumeDetailPage({
                 </p>
               </div>
             </div>
-            <Link href={`/resume/${resume._id}/generate`}>
+            <Link href={`/resume/${resume.id}/generate`}>
               <Button>
                 <Sparkles className="h-4 w-4 mr-2" />
                 生成标准版
@@ -152,9 +152,9 @@ export default async function ResumeDetailPage({
       )}
 
       {resume.type === "tailored" &&
-        resume.confirmableItems &&
-        resume.confirmableItems.length > 0 &&
-        !resume.confirmCompleted && (
+        resume.confirmable_items &&
+        resume.confirmable_items.length > 0 &&
+        !resume.confirm_completed && (
           <Card>
             <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
               <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ export default async function ResumeDetailPage({
                   <p className="text-sm text-muted-foreground">
                     有{" "}
                     {
-                      resume.confirmableItems.filter(
+                      resume.confirmable_items.filter(
                         (i) => i.status === "pending",
                       ).length
                     }{" "}
@@ -172,7 +172,7 @@ export default async function ResumeDetailPage({
                   </p>
                 </div>
               </div>
-              <Link href={`/resume/${resume._id}/confirm`}>
+              <Link href={`/resume/${resume.id}/confirm`}>
                 <Button>
                   <AlertTriangle className="h-4 w-4 mr-2" />
                   去审核
@@ -184,13 +184,13 @@ export default async function ResumeDetailPage({
 
       {resume.type === "tailored" && resume.greeting && (
         <GreetingCard
-          resumeId={resume._id}
+          resumeId={resume.id}
           greeting={resume.greeting}
           showRegenerate={true}
         />
       )}
 
-      {resume.type === "tailored" && resume.confirmCompleted && (
+      {resume.type === "tailored" && resume.confirm_completed && (
         <Card>
           <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-4">
             <div className="flex items-center gap-3">
@@ -202,7 +202,7 @@ export default async function ResumeDetailPage({
                 </p>
               </div>
             </div>
-            <Link href={`/interview?resumeId=${resume._id}&action=new`}>
+            <Link href={`/interview?resumeId=${resume.id}&action=new`}>
               <Button>
                 <Mic className="h-4 w-4 mr-2" />
                 生成面试题
@@ -219,7 +219,7 @@ export default async function ResumeDetailPage({
               中文版（{zhPages} 页）
               {zhPlaceholders.length > 0 && (
                 <Badge variant="warning" className="ml-2">
-                  {countPlaceholders(resume.content?.zh ?? "")} 处待填
+                  {countPlaceholders(resume.raw_content ?? "")} 处待填
                 </Badge>
               )}
             </TabsTrigger>
@@ -227,7 +227,7 @@ export default async function ResumeDetailPage({
               英文版（{enPages} 页）
               {enPlaceholders.length > 0 && (
                 <Badge variant="warning" className="ml-2">
-                  {countPlaceholders(resume.content?.en ?? "")} 处待填
+                  {countPlaceholders(resume.raw_content ?? "")} 处待填
                 </Badge>
               )}
             </TabsTrigger>
@@ -243,7 +243,7 @@ export default async function ResumeDetailPage({
               </CardHeader>
               <CardContent>
                 <pre className="whitespace-pre-wrap text-sm font-mono bg-muted/50 p-4 rounded-md">
-                  {resume.content?.zh || "暂无中文版内容"}
+                  {resume.raw_content || "暂无内容"}
                 </pre>
                 {zhPlaceholders.length > 0 && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
@@ -269,7 +269,7 @@ export default async function ResumeDetailPage({
               </CardHeader>
               <CardContent>
                 <pre className="whitespace-pre-wrap text-sm font-mono bg-muted/50 p-4 rounded-md">
-                  {resume.content?.en || "No English content yet"}
+                  {resume.raw_content || "No English content yet"}
                 </pre>
                 {enPlaceholders.length > 0 && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
@@ -353,7 +353,7 @@ export default async function ResumeDetailPage({
               此简历尚未生成标准版内容
             </p>
             {resume.type === "master" && (
-              <Link href={`/resume/${resume._id}/generate`}>
+              <Link href={`/resume/${resume.id}/generate`}>
                 <Button>
                   <Sparkles className="h-4 w-4 mr-2" />
                   生成标准版
@@ -364,21 +364,21 @@ export default async function ResumeDetailPage({
         </Card>
       )}
 
-      {resume.aiFlavorScore !== undefined && resume.aiFlavorScore > 0 && (
+      {resume.ai_flavor_score !== undefined && resume.ai_flavor_score !== null && resume.ai_flavor_score > 0 && (
         <Card>
           <CardContent className="py-4">
             <div className="flex items-center gap-3">
-              {resume.aiFlavorScore < 6 ? (
+              {resume.ai_flavor_score < 6 ? (
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
               ) : (
                 <AlertTriangle className="h-5 w-5 text-orange-600" />
               )}
               <div>
                 <p className="font-medium">
-                  AI 味检测：{resume.aiFlavorScore} 次命中
+                  AI 味检测：{resume.ai_flavor_score} 次命中
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {resume.aiFlavorScore < 6
+                  {resume.ai_flavor_score < 6
                     ? "通过检测，AI 味较低"
                     : "命中较多，建议修改"}
                 </p>

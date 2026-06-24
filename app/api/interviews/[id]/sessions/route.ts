@@ -23,7 +23,7 @@ export async function GET(
     const sessions = await listSessionsByInterview(params.id, session.userId);
     const sessionsWithTotal = sessions.map((s) => ({
       ...s,
-      totalQuestions: interview.questions.length,
+      total_questions: interview.questions.length,
     }));
 
     return successResponse({ sessions: sessionsWithTotal });

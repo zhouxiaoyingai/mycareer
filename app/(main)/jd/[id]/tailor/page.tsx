@@ -12,12 +12,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
-
-interface StandardResume {
-  _id: string;
-  targetRole?: string;
-  updatedAt: string;
-}
+import type { StandardResume } from "@/types/resume";
 
 export default function TailorPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -37,7 +32,7 @@ export default function TailorPage({ params }: { params: { id: string } }) {
         const data = await response.json();
         setStandardResumes(data.data.resumes || []);
         if (data.data.resumes?.length > 0)
-          setSelectedId(data.data.resumes[0]._id);
+          setSelectedId(data.data.resumes[0].id);
       } catch (err) {
         setError(err instanceof Error ? err.message : "加载失败");
       } finally {
@@ -118,9 +113,9 @@ export default function TailorPage({ params }: { params: { id: string } }) {
               <div className="space-y-2">
                 {standardResumes.map((resume) => (
                   <label
-                    key={resume._id}
+                    key={resume.id}
                     className={`flex items-center gap-3 p-3 border rounded-md cursor-pointer transition-colors ${
-                      selectedId === resume._id
+                      selectedId === resume.id
                         ? "border-primary bg-primary/5"
                         : "hover:bg-muted/50"
                     }`}
@@ -128,18 +123,18 @@ export default function TailorPage({ params }: { params: { id: string } }) {
                     <input
                       type="radio"
                       name="standardResume"
-                      value={resume._id}
-                      checked={selectedId === resume._id}
+                      value={resume.id}
+                      checked={selectedId === resume.id}
                       onChange={(e) => setSelectedId(e.target.value)}
                       className="h-4 w-4"
                     />
                     <div className="flex-1">
                       <p className="font-medium">
-                        {resume.targetRole || "标准版简历"}
+                        {resume.target_role || "标准版简历"}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         更新于{" "}
-                        {new Date(resume.updatedAt).toLocaleDateString("zh-CN")}
+                        {new Date(resume.updated_at).toLocaleDateString("zh-CN")}
                       </p>
                     </div>
                   </label>

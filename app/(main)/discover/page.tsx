@@ -677,14 +677,22 @@ export default function DiscoverPage() {
   if (pageState === "idle") {
     return (
       <div className="max-w-2xl mx-auto py-12">
-        <PrefillBanner
-          onApply={(data) => {
-            setAnswers((prev) => ({
-              ...prev,
-              yearsOfExperience: data.yearsOfExperience,
-            }));
-          }}
-        />
+        <Card className="mb-4 border-dashed border-primary/40 bg-primary/5">
+          <CardContent className="py-3 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              检测到您之前填写过类似信息,是否自动填充?
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                setAnswers((prev) => ({ ...prev, yearsOfExperience: 0 }))
+              }
+            >
+              快速填充
+            </Button>
+          </CardContent>
+        </Card>
         <Card className="text-center py-12">
           <CardContent>
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">

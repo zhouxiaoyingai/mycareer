@@ -27,7 +27,7 @@ export default function ConfirmPage({ params }: { params: { id: string } }) {
         const response = await fetch(`/api/resumes/${params.id}`);
         if (!response.ok) throw new Error("加载失败");
         const data = await response.json();
-        setItems(data.data.confirmableItems || []);
+        setItems(data.data.confirmable_items || []);
         setGreeting(data.data.greeting);
       } catch (err) {
         setError(err instanceof Error ? err.message : "加载失败");

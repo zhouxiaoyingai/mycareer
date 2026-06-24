@@ -92,8 +92,8 @@ export interface InterviewSession {
 export interface SessionListItem {
   id: string;
   status: SessionStatus;
-  answeredCount: number;
-  totalQuestions: number;
+  answered_count: number;
+  total_questions: number;
   overall_score: number | null;
   created_at: string;
   updated_at: string;

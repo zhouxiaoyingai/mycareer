@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/lib/cloudbase/auth";
-import { listResumesByUser } from "@/lib/cloudbase/resumes";
+import { getCurrentUser } from "@/lib/supabase/auth";
+import { listResumesByUser } from "@/lib/supabase/db/resumes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -117,12 +117,12 @@ export default async function ResumeListPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {list.map((resume) => (
-                    <Link key={resume._id} href={`/resume/${resume._id}`}>
+                    <Link key={resume.id} href={`/resume/${resume.id}`}>
                       <Card className="hover:border-primary transition-colors cursor-pointer h-full">
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
                             <CardTitle className="text-base">
-                              {resume.targetRole || typeLabels[resume.type]}
+                              {resume.target_role || typeLabels[resume.type]}
                             </CardTitle>
                             <Badge variant={statusVariants[resume.status]}>
                               {statusLabels[resume.status]}
@@ -132,7 +132,7 @@ export default async function ResumeListPage() {
                         <CardContent>
                           <p className="text-xs text-muted-foreground">
                             更新于{" "}
-                            {new Date(resume.updatedAt).toLocaleDateString("zh-CN")}
+                            {new Date(resume.updated_at).toLocaleDateString("zh-CN")}
                           </p>
                         </CardContent>
                       </Card>

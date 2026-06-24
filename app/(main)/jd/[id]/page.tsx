@@ -1,6 +1,6 @@
-import { getCurrentUser } from "@/lib/cloudbase/auth";
-import { getJdById, deleteJd } from "@/lib/cloudbase/jds";
-import { listResumesByUser } from "@/lib/cloudbase/resumes";
+import { getCurrentUser } from "@/lib/supabase/auth";
+import { getJdById, deleteJd } from "@/lib/supabase/db/jds";
+import { listResumesByUser } from "@/lib/supabase/db/resumes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -123,7 +123,7 @@ export default async function JdDetailPage({
           {standardResumes.length === 0 ? (
             <p className="text-sm text-orange-600">请先创建并确认标准版简历</p>
           ) : (
-            <Link href={`/jd/${jd._id}/tailor`}>
+            <Link href={`/jd/${jd.id}/tailor`}>
               <Button>
                 <Sparkles className="h-4 w-4 mr-2" />
                 生成定制简历
@@ -147,7 +147,7 @@ export default async function JdDetailPage({
           {standardResumes.length === 0 ? (
             <p className="text-sm text-orange-600">请先创建并确认标准版简历</p>
           ) : (
-            <Link href={`/interview?jdId=${jd._id}&action=new`}>
+            <Link href={`/interview?jdId=${jd.id}&action=new`}>
               <Button>
                 <Mic className="h-4 w-4 mr-2" />
                 生成面试题

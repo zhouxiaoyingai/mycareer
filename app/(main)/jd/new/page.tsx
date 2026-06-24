@@ -56,7 +56,7 @@ export default function JdNewPage() {
         throw new Error(data.error?.message || "保存失败");
       }
       const createData = await createResponse.json();
-      router.push(`/jd/${createData.data._id}`);
+      router.push(`/jd/${createData.data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "处理失败");
     } finally {

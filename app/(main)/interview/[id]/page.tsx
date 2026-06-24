@@ -80,7 +80,7 @@ export default function InterviewDetailPage({
         throw new Error(err.error?.message || "创建会话失败");
       }
       const json = await response.json();
-      router.push(`/interview/${params.id}/sessions/${json.data.session._id}`);
+      router.push(`/interview/${params.id}/sessions/${json.data.session.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "创建会话失败");
       setStarting(false);
@@ -134,11 +134,11 @@ export default function InterviewDetailPage({
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold">{data?.interview.jdSnapshot.title}</h1>
+          <h1 className="text-2xl font-bold">{data?.interview.jd_snapshot.title}</h1>
           <div className="flex items-center gap-2 mt-1">
-            {data?.interview.jdSnapshot.company && (
+            {data?.interview.jd_snapshot.company && (
               <span className="text-sm text-muted-foreground">
-                {data.interview.jdSnapshot.company}
+                {data.interview.jd_snapshot.company}
               </span>
             )}
             <Badge variant="outline">
@@ -238,7 +238,7 @@ export default function InterviewDetailPage({
             <div className="space-y-2">
               {data.sessions.map((s, idx) => (
                 <div
-                  key={s._id}
+                  key={s.id}
                   className="flex items-center justify-between py-3 border-b last:border-0"
                 >
                   <div className="flex items-center gap-3">
@@ -257,23 +257,23 @@ export default function InterviewDetailPage({
                       </Badge>
                     )}
                     <span className="text-xs text-muted-foreground">
-                      {s.answeredCount}/{s.totalQuestions} 题
-                      {s.overallScore !== undefined && (
+                      {s.answered_count}/{s.total_questions} 题
+                      {s.overall_score !== undefined && (
                         <span className="ml-2 font-medium text-foreground">
-                          得分 {s.overallScore}
+                          得分 {s.overall_score}
                         </span>
                       )}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">
-                      {new Date(s.createdAt).toLocaleString("zh-CN")}
+                      {new Date(s.created_at).toLocaleString("zh-CN")}
                     </span>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        router.push(`/interview/${params.id}/sessions/${s._id}`)
+                        router.push(`/interview/${params.id}/sessions/${s.id}`)
                       }
                     >
                       {s.status === "completed" ? "查看" : "继续"}

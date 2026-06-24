@@ -2,7 +2,6 @@
  * 简历相关类型定义
  * 字段命名与 Supabase PostgreSQL schema 对齐（snake_case）
  */
-
 import type { MatchAnalysis, ConfirmableItem } from "./jd";
 
 /** 简历类型 */
@@ -145,3 +144,30 @@ export interface ParsedResumeResult {
   structured: ResumeStructured;
   provenance: ProvenanceEntry[];
 }
+
+/** 简历生成选项 (提示词输入) */
+export interface GenerateStandardOptions {
+  templateStyle: "star" | "project" | "skill" | "mixed";
+  length: "1page" | "2page" | "auto";
+  language: "zh" | "en" | "both";
+}
+
+/** 简历内容 (中英双版本) — 提示词层使用 */
+export interface ResumeContent {
+  zh: string;
+  en: string;
+}
+
+/** 标准版简历视图 (前端列表/选择器) */
+export type StandardResume = Pick<
+  Resume,
+  | "id"
+  | "user_id"
+  | "type"
+  | "raw_content"
+  | "structured"
+  | "target_role"
+  | "status"
+  | "created_at"
+  | "updated_at"
+>;

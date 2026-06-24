@@ -1,5 +1,7 @@
-import { getCurrentUser } from "@/lib/cloudbase/auth";
-import { findMany, Collections } from "@/lib/cloudbase/db";
+import { getCurrentUser } from "@/lib/supabase/auth";
+import { listResumesByUser } from "@/lib/supabase/db/resumes";
+import { listJdsByUser } from "@/lib/supabase/db/jds";
+import { listInterviewsByUser } from "@/lib/supabase/db/interviews";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, Briefcase, Mic, Send, Upload, ClipboardPaste, Play } from "lucide-react";
 import { DashboardWidget } from "@/components/discover/dashboard-widget";
@@ -12,18 +14,17 @@ export default async function DashboardPage() {
   if (!session) redirect("/login");
   const t = await getTranslations("dashboard");
 
-  const [resumes, jds, interviews, applications] = await Promise.all([
-    findMany(Collections.RESUMES, { userId: session.userId }),
-    findMany(Collections.JDS, { userId: session.userId }),
-    findMany(Collections.INTERVIEWS, { userId: session.userId }),
-    findMany(Collections.APPLICATIONS, { userId: session.userId }),
+  const [resumes, jds, interviews] = await Promise.all([
+    listResumesByUser(session.userId),
+    listJdsByUser(session.userId),
+    listInterviewsByUser(session.userId),
   ]);
 
   const stats = [
     { label: t("resumeCount"), value: resumes.length, icon: FileText },
     { label: t("jdCount"), value: jds.length, icon: Briefcase },
     { label: t("interviewCount"), value: interviews.length, icon: Mic },
-    { label: t("applicationCount"), value: applications.length, icon: Send },
+    { label: t("applicationCount"), value: 0, icon: Send },
   ];
 
   const quickActions = [

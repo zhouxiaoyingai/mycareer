@@ -69,9 +69,9 @@ export default function SessionPlayPage({
   const questions = data?.interview.questions ?? [];
   const currentQuestion = questions.find((q) => !answeredIds.has(q.id));
   const currentIndex = questions.findIndex((q) => !answeredIds.has(q.id));
-  const answeredCount = data?.session.answers.length ?? 0;
-  const totalQuestions = questions.length;
-  const progress = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
+  const answered_count = data?.session.answers.length ?? 0;
+  const total_questions = questions.length;
+  const progress = total_questions > 0 ? (answered_count / total_questions) * 100 : 0;
 
   const handleSubmitAnswer = async () => {
     if (!currentQuestion || !currentAnswer.trim()) return;
@@ -160,14 +160,14 @@ export default function SessionPlayPage({
             {isCompleted ? "答题结果" : "答题演练"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {data?.interview.jdSnapshot.title}
+            {data?.interview.jd_snapshot.title}
           </p>
         </div>
-        {isCompleted && data?.session.overallScore !== undefined && (
+        {isCompleted && data?.session.overall_score !== undefined && (
           <div className="text-right">
             <div className="text-2xl font-bold flex items-center gap-1">
               <Trophy className="h-5 w-5 text-yellow-500" />
-              {data.session.overallScore}
+              {data.session.overall_score}
             </div>
             <p className="text-xs text-muted-foreground">总分</p>
           </div>
@@ -190,7 +190,7 @@ export default function SessionPlayPage({
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">答题进度</span>
               <span className="text-sm text-muted-foreground">
-                {answeredCount} / {totalQuestions}
+                {answered_count} / {total_questions}
               </span>
             </div>
             <Progress value={progress} />
@@ -199,14 +199,14 @@ export default function SessionPlayPage({
       )}
 
       {/* 整体反馈 */}
-      {isCompleted && data?.session.overallFeedback && (
+      {isCompleted && data?.session.overall_feedback && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">整体反馈</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm whitespace-pre-wrap">
-              {data.session.overallFeedback}
+              {data.session.overall_feedback}
             </p>
           </CardContent>
         </Card>
@@ -221,7 +221,7 @@ export default function SessionPlayPage({
                 {questionTypeLabels[currentQuestion.type]}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                第 {currentIndex + 1} / {totalQuestions} 题
+                第 {currentIndex + 1} / {total_questions} 题
               </span>
             </div>
             <CardTitle className="text-base mt-2">
@@ -285,7 +285,7 @@ export default function SessionPlayPage({
       {data && data.session.answers.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">已答题（{answeredCount}）</CardTitle>
+            <CardTitle className="text-base">已答题（{answered_count}）</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {data.session.answers.map((ans, idx) => {
@@ -319,7 +319,7 @@ export default function SessionPlayPage({
       });
       if (!response.ok) throw new Error("创建会话失败");
       const json = await response.json();
-      router.push(`/interview/${params.id}/sessions/${json.data.session._id}`);
+      router.push(`/interview/${params.id}/sessions/${json.data.session.id}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "创建会话失败");
     }

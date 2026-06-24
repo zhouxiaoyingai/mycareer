@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/lib/cloudbase/auth";
-import { listJdsByUser } from "@/lib/cloudbase/jds";
+import { getCurrentUser } from "@/lib/supabase/auth";
+import { listJdsByUser } from "@/lib/supabase/db/jds";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,12 +67,12 @@ export default async function JdListPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {jds.map((jd) => (
-            <Link key={jd._id} href={`/jd/${jd._id}`}>
+            <Link key={jd.id} href={`/jd/${jd.id}`}>
               <Card className="hover:border-primary transition-colors cursor-pointer h-full">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-base">
-                      {jd.structuredTitle || jd.targetRole || "未命名 JD"}
+                      {jd.structured.title || jd.target_role || "未命名 JD"}
                     </CardTitle>
                     <Badge variant={statusVariants[jd.status]}>
                       {statusLabels[jd.status]}
@@ -80,13 +80,13 @@ export default async function JdListPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {jd.structuredCompany && (
+                  {jd.structured.company && (
                     <p className="text-sm text-muted-foreground">
-                      {jd.structuredCompany}
+                      {jd.structured.company}
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground mt-2">
-                    更新于 {new Date(jd.updatedAt).toLocaleDateString("zh-CN")}
+                    更新于 {new Date(jd.updated_at).toLocaleDateString("zh-CN")}
                   </p>
                 </CardContent>
               </Card>

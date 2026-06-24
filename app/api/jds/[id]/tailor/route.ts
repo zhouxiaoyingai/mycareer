@@ -55,7 +55,7 @@ export async function POST(
     }
 
     const messages = buildResumeTailorMessages({
-      standardContent: standard.raw_content,
+      standardContent: { zh: standard.raw_content, en: standard.raw_content },
       structured: standard.structured,
       jdText: jd.raw_text,
       targetRole: jd.target_role ?? undefined,
