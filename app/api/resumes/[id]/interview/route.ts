@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getResumeById } from "@/lib/cloudbase/resumes";
-import { getJdById } from "@/lib/cloudbase/jds";
-import { createInterview } from "@/lib/cloudbase/interviews";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getResumeById } from "@/lib/supabase/db/resumes";
+import { getJdById } from "@/lib/supabase/db/jds";
+import { createInterview } from "@/lib/supabase/db/interviews";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import {
   buildInterviewGenerateMessages,
@@ -31,19 +31,19 @@ export async function POST(
     if (resume.type !== "tailored") {
       return validationErrorResponse("仅支持定制版简历生成面试题");
     }
-    if (!resume.jdId) return validationErrorResponse("该简历缺少关联的 JD");
-    if (!resume.content?.zh) return validationErrorResponse("简历缺少中文版内容");
+    if (!resume.jd_id) return validationErrorResponse("该简历缺少关联的 JD");
+    if (!resume.raw_content) return validationErrorResponse("简历缺少中文版内容");
 
-    const jd = await getJdById(resume.jdId, session.userId);
+    const jd = await getJdById(resume.jd_id, session.userId);
     if (!jd) return errorResponse("NOT_FOUND", "关联的 JD 不存在", 404);
 
     const resumeSnapshot = {
-      resumeId: resume._id,
-      targetRole: resume.targetRole,
-      contentZh: resume.content.zh,
+      resumeId: resume.id,
+      targetRole: resume.target_role ?? undefined,
+      contentZh: resume.raw_content,
     };
     const jdSnapshot = {
-      jdId: jd._id,
+      jdId: jd.id,
       title: jd.structured.title,
       company: jd.structured.company,
       hardSkills: jd.structured.hardSkills.map((s) => ({ name: s.name, weight: s.weight })),
@@ -51,7 +51,7 @@ export async function POST(
 
     const messages = buildInterviewGenerateMessages({
       jdStructured: jd.structured,
-      resumeZhContent: resume.content.zh,
+      resumeZhContent: resume.raw_content,
     });
 
     const aiResponse = await callDeepSeekWithRetry(messages, {
@@ -64,8 +64,8 @@ export async function POST(
 
     const interview = await createInterview({
       userId: session.userId,
-      resumeId: resume._id,
-      jdId: jd._id,
+      resumeId: resume.id,
+      jdId: jd.id,
       resumeSnapshot,
       jdSnapshot,
       questionTypes: ["technical", "behavioral", "case", "general"],

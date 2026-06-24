@@ -1,8 +1,11 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { createStrengthReport, listStrengthReportsByUser } from "@/lib/cloudbase/strength";
-import { generateStrengthReport } from "@/lib/ai/prompts/strength-analyze";
+import { requireAuth } from "@/lib/supabase/auth";
+import {
+  createStrengthReport,
+  generateAndSaveReport,
+  listStrengthReportsByUser,
+} from "@/lib/supabase/db/strength";
 import {
   successResponse,
   unauthorizedResponse,
@@ -45,11 +48,11 @@ export async function POST(request: NextRequest) {
     const report = await createStrengthReport({ userId: session.userId, answers });
 
     // 触发后台异步生成（不等待完成）
-    generateStrengthReport(report._id, session.userId).catch((err) => {
-      console.error(`[strength] async generation failed for ${report._id}:`, err);
+    generateAndSaveReport(report.id, session.userId).catch((err: unknown) => {
+      console.error(`[strength] async generation failed for ${report.id}:`, err);
     });
 
-    return successResponse({ id: report._id, status: report.status }, 201);
+    return successResponse({ id: report.id, status: report.status }, 201);
   } catch (error) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return unauthorizedResponse();

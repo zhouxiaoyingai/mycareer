@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
+import { requireAuth } from "@/lib/supabase/auth";
 import {
   getResumeById,
   updateResume,
   deleteResume,
-} from "@/lib/cloudbase/resumes";
+} from "@/lib/supabase/db/resumes";
 import {
   successResponse,
   validationErrorResponse,
@@ -68,12 +68,11 @@ export async function PATCH(
 
     await updateResume(params.id, session.userId, {
       structured: parsed.data.structured as unknown as import("@/types/resume").ResumeStructured | undefined,
-      content: parsed.data.content,
+      raw_content: parsed.data.rawContent ?? parsed.data.content?.zh,
       provenance: parsed.data.provenance as unknown as import("@/types/resume").ProvenanceEntry[] | undefined,
-      aiFlavorScore: parsed.data.aiFlavorScore,
+      ai_flavor_score: parsed.data.aiFlavorScore,
       status: parsed.data.status,
-      targetRole: parsed.data.targetRole,
-      rawContent: parsed.data.rawContent,
+      target_role: parsed.data.targetRole,
     });
 
     const updated = await getResumeById(params.id, session.userId);

@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getJdById } from "@/lib/cloudbase/jds";
-import { getResumeById, createResume, updateResume } from "@/lib/cloudbase/resumes";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getJdById } from "@/lib/supabase/db/jds";
+import { getResumeById, createResume, updateResume } from "@/lib/supabase/db/resumes";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import {
   buildResumeTailorMessages,
@@ -50,15 +50,15 @@ export async function POST(
         `仅支持从标准版简历生成定制版，当前简历类型: ${standard.type}`,
       );
     }
-    if (!standard.content) {
+    if (!standard.raw_content) {
       return validationErrorResponse("标准版简历尚未生成内容，请先生成标准版");
     }
 
     const messages = buildResumeTailorMessages({
-      standardContent: standard.content,
+      standardContent: standard.raw_content,
       structured: standard.structured,
-      jdText: jd.rawText,
-      targetRole: jd.targetRole,
+      jdText: jd.raw_text,
+      targetRole: jd.target_role ?? undefined,
     });
 
     const aiResponse = await callDeepSeekWithRetry(messages, {
@@ -78,39 +78,39 @@ export async function POST(
     const tailoredResume = await createResume({
       userId: session.userId,
       type: "tailored",
-      sourceType: standard.sourceType,
-      sourceFileId: standard.sourceFileId,
-      rawContent: standard.rawContent,
+      sourceType: standard.source_type,
+      sourceFileId: standard.source_file_id ?? undefined,
+      rawContent: standard.raw_content,
       structured: standard.structured,
-      targetRole: jd.targetRole,
+      targetRole: jd.target_role ?? undefined,
       parentId: standardResumeId,
       status: "draft",
     });
 
-    await updateResume(tailoredResume._id, session.userId, {
-      content: result.content,
+    await updateResume(tailoredResume.id, session.userId, {
+      raw_content: result.content.zh,
       provenance: result.provenance,
-      aiFlavorScore,
-      jdId: params.id,
-      matchAnalysis: result.matchAnalysis,
-      confirmableItems: result.confirmableItems,
-      confirmCompleted: result.confirmableItems.length === 0,
+      ai_flavor_score: aiFlavorScore,
+      jd_id: params.id,
+      match_analysis: result.matchAnalysis,
+      confirmable_items: result.confirmableItems,
+      confirm_completed: result.confirmableItems.length === 0,
       status: "completed",
       greeting: result.greeting
         ? {
             text: result.greeting.text,
-            generatedAt: new Date(),
+            generatedAt: new Date().toISOString(),
             version: 1,
           }
-        : undefined,
+        : null,
     });
 
     return successResponse({
-      resumeId: tailoredResume._id,
-      content: result.content,
+      resumeId: tailoredResume.id,
+      raw_content: result.content.zh,
       provenance: result.provenance,
-      matchAnalysis: result.matchAnalysis,
-      confirmableItems: result.confirmableItems,
+      match_analysis: result.matchAnalysis,
+      confirmable_items: result.confirmableItems,
       aiFlavorScore,
       aiFlavorPassed: zhFlavor.passed && enFlavor.passed,
       placeholderCount: {

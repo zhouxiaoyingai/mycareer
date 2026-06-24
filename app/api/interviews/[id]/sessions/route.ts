@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getInterviewById } from "@/lib/cloudbase/interviews";
-import { createSession, listSessionsByInterview } from "@/lib/cloudbase/interview-sessions";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getInterviewById } from "@/lib/supabase/db/interviews";
+import { createSession, listSessionsByInterview } from "@/lib/supabase/db/interview-sessions";
 import {
   successResponse,
   unauthorizedResponse,

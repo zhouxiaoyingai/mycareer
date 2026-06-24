@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getJdById, updateJd, deleteJd } from "@/lib/cloudbase/jds";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getJdById, updateJd, deleteJd } from "@/lib/supabase/db/jds";
 import {
   successResponse,
   unauthorizedResponse,
@@ -39,7 +39,7 @@ const updateSchema = z.object({
     requirements: z.array(z.string()).default([]),
     niceToHave: z.array(z.string()).default([]),
   }).optional(),
-  targetRole: z.string().optional(),
+  target_role: z.string().optional(),
   status: z.enum(["draft", "parsed", "archived"]).optional(),
 });
 

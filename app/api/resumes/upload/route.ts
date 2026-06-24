@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
+import { requireAuth } from "@/lib/supabase/auth";
 import { extractTextFromFile } from "@/lib/utils/file-extract";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import { buildResumeParseMessages } from "@/lib/ai/prompts/resume-parse";
-import { createResume } from "@/lib/cloudbase/resumes";
+import { createResume } from "@/lib/supabase/db/resumes";
 import {
   successResponse,
   validationErrorResponse,
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     return successResponse({
-      resumeId: resume._id,
+      resumeId: resume.id,
       fileName: extractResult.fileName,
       sourceType: extractResult.sourceType,
       rawContent: extractResult.text,

@@ -1,21 +1,13 @@
 // lib/supabase/db/interview-sessions.ts
 import { createClient } from "../server";
+import type { InterviewSession, SessionAnswer, SessionStatus } from "@/types/interview";
 
-export interface InterviewSession {
-  id: string;
-  user_id: string;
-  interview_id: string;
-  answers: unknown[];
-  overall_score: number | null;
-  overall_feedback: string | null;
-  status: "in_progress" | "completed" | "abandoned";
-  created_at: string;
-  updated_at: string;
-}
+export type { InterviewSession, SessionAnswer, SessionStatus };
 
 export interface CreateSessionInput {
   userId: string;
   interviewId: string;
+  status?: SessionStatus;
 }
 
 export interface SessionStats {

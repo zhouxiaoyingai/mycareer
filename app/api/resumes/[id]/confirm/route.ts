@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getResumeById, updateResume } from "@/lib/cloudbase/resumes";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getResumeById, updateResume } from "@/lib/supabase/db/resumes";
 import { isConfirmCompleted } from "@/lib/ai/prompts/shared/confirmable-items";
 import {
   successResponse,
@@ -43,14 +43,14 @@ export async function POST(
     if (resume.type !== "tailored") {
       return validationErrorResponse("仅定制版简历支持待确认项处理");
     }
-    if (!resume.confirmableItems || resume.confirmableItems.length === 0) {
+    if (!resume.confirmable_items || resume.confirmable_items.length === 0) {
       return validationErrorResponse("该简历无待确认项");
     }
 
     const userConfirmations = new Map(
       parsed.data.items.map((item) => [item.id, item]),
     );
-    const updatedItems: ConfirmableItem[] = resume.confirmableItems.map(
+    const updatedItems: ConfirmableItem[] = resume.confirmable_items.map(
       (item) => {
         const userResp = userConfirmations.get(item.id);
         if (!userResp) return item;
@@ -64,14 +64,14 @@ export async function POST(
 
     const confirmCompleted = isConfirmCompleted(updatedItems);
     await updateResume(params.id, session.userId, {
-      confirmableItems: updatedItems,
-      confirmCompleted,
+      confirmable_items: updatedItems,
+      confirm_completed: confirmCompleted,
       status: "completed",
     });
 
     return successResponse({
       resumeId: params.id,
-      confirmableItems: updatedItems,
+      confirmable_items: updatedItems,
       confirmCompleted,
     });
   } catch (error) {

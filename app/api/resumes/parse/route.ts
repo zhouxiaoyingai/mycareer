@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
+import { requireAuth } from "@/lib/supabase/auth";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import { buildResumeParseMessages } from "@/lib/ai/prompts/resume-parse";
 import {

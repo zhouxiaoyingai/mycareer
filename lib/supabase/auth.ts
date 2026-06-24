@@ -20,7 +20,7 @@ export async function requireAuth(): Promise<Session> {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("UNAUTHORIZED");
   }
 
   // 读取 profile 扩展信息

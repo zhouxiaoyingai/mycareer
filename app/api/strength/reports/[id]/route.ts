@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getStrengthReportById, deleteStrengthReport } from "@/lib/cloudbase/strength";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getStrengthReportById, deleteStrengthReport } from "@/lib/supabase/db/strength";
 import {
   successResponse,
   unauthorizedResponse,

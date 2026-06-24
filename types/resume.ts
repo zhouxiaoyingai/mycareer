@@ -1,5 +1,6 @@
 /**
  * 简历相关类型定义
+ * 字段命名与 Supabase PostgreSQL schema 对齐（snake_case）
  */
 
 import type { MatchAnalysis, ConfirmableItem } from "./jd";
@@ -24,6 +25,40 @@ export type ResumeStatus =
   | "failed"
   | "confirmed"
   | "archived";
+
+/** 简历数据库对象 */
+export interface Resume {
+  id: string;
+  user_id: string;
+  type: ResumeType;
+  source_type: ResumeSourceType;
+  source_file_id: string | null;
+  raw_content: string;
+  structured: ResumeStructured;
+  target_role: string | null;
+  parent_id: string | null;
+  provenance: ProvenanceEntry[];
+  ai_flavor_score: number | null;
+  status: ResumeStatus;
+  greeting: Greeting | null;
+  jd_id: string | null;
+  match_analysis: MatchAnalysis | null;
+  confirmable_items: ConfirmableItem[] | null;
+  confirm_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 简历列表项 */
+export interface ResumeListItem {
+  id: string;
+  type: ResumeType;
+  status: ResumeStatus;
+  target_role: string | null;
+  source_type: ResumeSourceType;
+  created_at: string;
+  updated_at: string;
+}
 
 /** 幻觉风险等级 */
 export type HallucinationRisk = "low" | "medium" | "high";
@@ -98,61 +133,11 @@ export interface ResumeStructured {
   skills: SkillSet;
 }
 
-/** 简历内容（中英双版） */
-export interface ResumeContent {
-  zh: string;
-  en: string;
-}
-
 /** 打招呼短文（嵌入定制简历） */
 export interface Greeting {
-  text: string;           // 打招呼短文（50-100字）
-  generatedAt: Date;      // 生成时间
-  version: number;        // 版本号，重新生成时 +1
-}
-
-/** 生成标准简历的选项 */
-export interface GenerateStandardOptions {
-  templateStyle: "star" | "project" | "skill" | "mixed";
-  length: "1page" | "2page" | "auto";
-  language: "zh" | "en" | "both";
-}
-
-/** 简历完整对象（数据库存储） */
-export interface Resume {
-  _id: string;
-  userId: string;
-  type: ResumeType;
-  sourceType: ResumeSourceType;
-  sourceFileId?: string;
-  rawContent: string;
-  structured: ResumeStructured;
-  content?: ResumeContent;
-  targetRole?: string;
-  parentId?: string;
-  provenance: ProvenanceEntry[];
-  aiFlavorScore: number;
-  status: ResumeStatus;
-  // 阶段3新增：JD 关联与待确认项
-  jdId?: string;
-  matchAnalysis?: MatchAnalysis;
-  confirmableItems?: ConfirmableItem[];
-  confirmCompleted?: boolean;
-  // 阶段4新增：打招呼短文（仅 tailored 类型简历）
-  greeting?: Greeting;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/** 简历列表项 */
-export interface ResumeListItem {
-  _id: string;
-  type: ResumeType;
-  status: ResumeStatus;
-  targetRole?: string;
-  sourceType: ResumeSourceType;
-  createdAt: Date;
-  updatedAt: Date;
+  text: string;
+  generatedAt: string;
+  version: number;
 }
 
 /** 解析简历结果 */

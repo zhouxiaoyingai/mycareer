@@ -1,23 +1,15 @@
 // lib/supabase/db/jds.ts
 import { createClient } from "../server";
+import type { Jd, JdStatus } from "@/types/jd";
 
-export interface Jd {
-  id: string;
-  user_id: string;
-  raw_text: string;
-  structured: Record<string, unknown>;
-  target_role: string | null;
-  status: "draft" | "parsed" | "archived";
-  created_at: string;
-  updated_at: string;
-}
+export type { Jd, JdStatus };
 
 export interface CreateJdInput {
   userId: string;
   rawText: string;
-  structured: Record<string, unknown>;
+  structured: Jd["structured"];
   targetRole?: string;
-  status?: Jd["status"];
+  status?: JdStatus;
 }
 
 export async function listJdsByUser(

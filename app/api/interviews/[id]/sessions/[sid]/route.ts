@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getInterviewById } from "@/lib/cloudbase/interviews";
-import { getSessionById } from "@/lib/cloudbase/interview-sessions";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getInterviewById } from "@/lib/supabase/db/interviews";
+import { getSessionById } from "@/lib/supabase/db/interview-sessions";
 import {
   successResponse,
   unauthorizedResponse,
@@ -22,7 +22,7 @@ export async function GET(
 
     const sessionData = await getSessionById(params.sid, session.userId);
     if (!sessionData) return errorResponse("NOT_FOUND", "答题会话不存在或无权访问", 404);
-    if (sessionData.interviewId !== params.id) {
+    if (sessionData.interview_id !== params.id) {
       return errorResponse("NOT_FOUND", "会话不属于该题集", 404);
     }
 

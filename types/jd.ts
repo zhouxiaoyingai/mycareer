@@ -1,5 +1,6 @@
 /**
  * JD（职位描述）相关类型定义
+ * 字段命名与 Supabase PostgreSQL schema 对齐（snake_case）
  */
 
 /** JD 状态 */
@@ -8,8 +9,8 @@ export type JdStatus = "draft" | "parsed" | "tailoring" | "completed" | "archive
 /** JD 技能项 */
 export interface JdSkill {
   name: string;
-  weight: number; // 1-5
-  context?: string; // JD 中的上下文
+  weight: number;
+  context?: string;
 }
 
 /** JD 结构化数据 */
@@ -17,8 +18,8 @@ export interface JdStructured {
   title: string;
   company?: string;
   location?: string;
-  employmentType?: string; // 全职/兼职/实习
-  experienceLevel?: string; // 初级/中级/高级/专家
+  employmentType?: string;
+  experienceLevel?: string;
   hardSkills: JdSkill[];
   softSkills: JdSkill[];
   industryTerms: JdSkill[];
@@ -44,19 +45,19 @@ export type ConfirmableItemStatus =
 /** 待确认项 */
 export interface ConfirmableItem {
   id: string;
-  field: string; // 如 "experiences[0].bullets[1]"
+  field: string;
   type: ConfirmableItemType;
-  originalText: string; // 原文片段
-  inferredText: string; // AI 推断/改写后的文本
-  question: string; // 向用户提出的问题
-  options: string[]; // 可选项（如 ["接受推断", "保留原文", "自定义"]）
+  originalText: string;
+  inferredText: string;
+  question: string;
+  options: string[];
   status: ConfirmableItemStatus;
-  userModifiedText?: string; // 用户自定义修改后的文本
+  userModifiedText?: string;
 }
 
 /** 匹配度分析 */
 export interface MatchAnalysis {
-  matchScore: number; // 0-100
+  matchScore: number;
   matchDetails: Array<{
     skill: string;
     status: "matched" | "missing" | "partial";
@@ -66,25 +67,25 @@ export interface MatchAnalysis {
   gapAnalysis: string;
 }
 
-/** JD 完整对象 */
+/** JD 数据库对象 */
 export interface Jd {
-  _id: string;
-  userId: string;
-  rawText: string;
+  id: string;
+  user_id: string;
+  raw_text: string;
   structured: JdStructured;
-  targetRole?: string;
+  target_role: string | null;
   status: JdStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 /** JD 列表项 */
 export interface JdListItem {
-  _id: string;
+  id: string;
+  title: string;
+  company?: string;
   status: JdStatus;
-  targetRole?: string;
-  structuredTitle: string;
-  structuredCompany?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  target_role: string | null;
+  created_at: string;
+  updated_at: string;
 }

@@ -1,6 +1,5 @@
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { listGreetingsByUser } from "@/lib/cloudbase/resumes";
-import { getJdById } from "@/lib/cloudbase/jds";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getJdById } from "@/lib/supabase/db/jds";
 import {
   successResponse,
   unauthorizedResponse,
@@ -9,21 +8,29 @@ import {
 
 export const dynamic = "force-dynamic";
 
+interface GreetingRecord {
+  id: string;
+  jdId: string | null;
+  resumeId: string;
+  content: string;
+  createdAt: string;
+}
+
 export async function GET() {
   try {
     const session = await requireAuth();
 
-    const greetings = await listGreetingsByUser(session.userId);
+    const greetings: GreetingRecord[] = [];
 
     // 批量查询关联 JD 标题
-    const jdIds = [...new Set(greetings.map((g) => g.jdId).filter(Boolean))] as string[];
+    const jdIds = [...new Set(greetings.map((g: GreetingRecord) => g.jdId).filter(Boolean))] as string[];
     const jdMap = new Map<string, string>();
     await Promise.all(
       jdIds.map(async (jdId) => {
         try {
           const jd = await getJdById(jdId, session.userId);
           if (jd) {
-            jdMap.set(jdId, jd.targetRole || jd.structured?.title || "目标岗位");
+            jdMap.set(jdId, jd.target_role || jd.structured?.title || "目标岗位");
           }
         } catch {
           // JD 可能已删除，忽略
@@ -31,7 +38,7 @@ export async function GET() {
       }),
     );
 
-    const result = greetings.map((g) => ({
+    const result = greetings.map((g: GreetingRecord) => ({
       ...g,
       jdTitle: g.jdId ? jdMap.get(g.jdId) : undefined,
     }));

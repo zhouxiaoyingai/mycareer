@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getInterviewById } from "@/lib/cloudbase/interviews";
-import { getSessionById, updateSession } from "@/lib/cloudbase/interview-sessions";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getInterviewById } from "@/lib/supabase/db/interviews";
+import { getSessionById, updateSession } from "@/lib/supabase/db/interview-sessions";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import {
   buildInterviewOverallMessages,
@@ -29,7 +29,7 @@ export async function POST(
 
     const sessionData = await getSessionById(params.sid, session.userId);
     if (!sessionData) return errorResponse("NOT_FOUND", "答题会话不存在或无权访问", 404);
-    if (sessionData.interviewId !== params.id) {
+    if (sessionData.interview_id !== params.id) {
       return errorResponse("NOT_FOUND", "会话不属于该题集", 404);
     }
     if (sessionData.status === "completed") {
@@ -53,14 +53,14 @@ export async function POST(
     const result = parseInterviewOverallResult(aiResponse.content);
 
     await updateSession(params.sid, session.userId, {
-      overallScore: result.overallScore,
-      overallFeedback: result.overallFeedback,
+      overall_score: result.overallScore,
+      overall_feedback: result.overallFeedback,
       status: "completed",
     });
 
     return successResponse({
-      overallScore: result.overallScore,
-      overallFeedback: result.overallFeedback,
+      overall_score: result.overallScore,
+      overall_feedback: result.overallFeedback,
       usage: aiResponse.usage,
     });
   } catch (error) {

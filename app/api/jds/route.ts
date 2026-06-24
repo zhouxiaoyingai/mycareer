@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { listJdsByUser, createJd } from "@/lib/cloudbase/jds";
+import { requireAuth } from "@/lib/supabase/auth";
+import { listJdsByUser, createJd } from "@/lib/supabase/db/jds";
 import {
   successResponse,
   unauthorizedResponse,
@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
     }
 
     const jds = await listJdsByUser(session.userId, {
-      status: status ?? undefined,
       limit,
     });
     return successResponse({ jds });

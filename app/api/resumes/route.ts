@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { listResumesByUser, createResume } from "@/lib/cloudbase/resumes";
+import { requireAuth } from "@/lib/supabase/auth";
+import { listResumesByUser, createResume } from "@/lib/supabase/db/resumes";
 import {
   successResponse,
   unauthorizedResponse,

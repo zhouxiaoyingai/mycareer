@@ -1,5 +1,6 @@
 /**
  * 模拟面试相关类型定义
+ * 字段命名与 Supabase PostgreSQL schema 对齐（snake_case）
  */
 
 export type QuestionType = "technical" | "behavioral" | "case" | "general";
@@ -34,33 +35,34 @@ export interface JdSnapshot {
   hardSkills: Array<{ name: string; weight: number }>;
 }
 
+/** Interview 数据库对象 */
 export interface Interview {
-  _id: string;
-  userId: string;
-  resumeId: string;
-  jdId: string;
-  resumeSnapshot: ResumeSnapshot;
-  jdSnapshot: JdSnapshot;
-  questionTypes: QuestionType[];
+  id: string;
+  user_id: string;
+  resume_id: string;
+  jd_id: string;
+  resume_snapshot: ResumeSnapshot;
+  jd_snapshot: JdSnapshot;
+  question_types: QuestionType[];
   questions: InterviewQuestion[];
   status: InterviewStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface InterviewListItem {
-  _id: string;
-  jdId: string;
-  jdTitle: string;
-  jdCompany?: string;
-  resumeId: string;
-  questionCount: number;
-  questionTypes: QuestionType[];
+  id: string;
+  jd_id: string;
+  jd_title: string;
+  jd_company?: string;
+  resume_id: string;
+  question_count: number;
+  question_types: QuestionType[];
   status: InterviewStatus;
-  sessionCount: number;
-  bestScore?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  session_count: number;
+  best_score?: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SessionAnswer {
@@ -69,29 +71,30 @@ export interface SessionAnswer {
   score: number;
   feedback: string;
   comparison: string;
-  scoredAt: Date;
+  scoredAt: string;
 }
 
 export type SessionStatus = "in_progress" | "completed";
 
+/** InterviewSession 数据库对象 */
 export interface InterviewSession {
-  _id: string;
-  userId: string;
-  interviewId: string;
+  id: string;
+  user_id: string;
+  interview_id: string;
   answers: SessionAnswer[];
-  overallScore?: number;
-  overallFeedback?: string;
+  overall_score: number | null;
+  overall_feedback: string | null;
   status: SessionStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SessionListItem {
-  _id: string;
+  id: string;
   status: SessionStatus;
   answeredCount: number;
   totalQuestions: number;
-  overallScore?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  overall_score: number | null;
+  created_at: string;
+  updated_at: string;
 }

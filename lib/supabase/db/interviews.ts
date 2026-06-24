@@ -1,28 +1,17 @@
 // lib/supabase/db/interviews.ts
 import { createClient } from "../server";
+import type { Interview, InterviewStatus, InterviewQuestion, QuestionType, ResumeSnapshot, JdSnapshot } from "@/types/interview";
 
-export interface Interview {
-  id: string;
-  user_id: string;
-  resume_id: string;
-  jd_id: string;
-  resume_snapshot: unknown;
-  jd_snapshot: unknown;
-  question_types: string[];
-  questions: unknown[];
-  status: "generated" | "in_progress" | "completed" | "archived";
-  created_at: string;
-  updated_at: string;
-}
+export type { Interview, InterviewStatus, InterviewQuestion, QuestionType, ResumeSnapshot, JdSnapshot };
 
 export interface CreateInterviewInput {
   userId: string;
   resumeId: string;
   jdId: string;
-  resumeSnapshot: unknown;
-  jdSnapshot: unknown;
-  questionTypes: string[];
-  questions: unknown[];
+  resumeSnapshot: ResumeSnapshot;
+  jdSnapshot: JdSnapshot;
+  questionTypes: QuestionType[];
+  questions: InterviewQuestion[];
 }
 
 export async function listInterviewsByUser(
@@ -82,7 +71,7 @@ export async function createInterview(
 export async function updateInterview(
   userId: string,
   id: string,
-  patch: Partial<Pick<Interview, "status" | "questions" | "question_types">>
+  patch: Partial<Pick<Interview, "status" | "questions" | "questionTypes">>
 ): Promise<Interview> {
   const supabase = await createClient();
   const { data, error } = await supabase

@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getJdById } from "@/lib/cloudbase/jds";
-import { getResumeById, listResumesByUser } from "@/lib/cloudbase/resumes";
-import { createInterview } from "@/lib/cloudbase/interviews";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getJdById } from "@/lib/supabase/db/jds";
+import { getResumeById, listResumesByUser } from "@/lib/supabase/db/resumes";
+import { createInterview } from "@/lib/supabase/db/interviews";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import {
   buildInterviewGenerateMessages,
@@ -35,10 +35,10 @@ export async function POST(
     let resumeId: string | undefined;
 
     for (const r of tailoredResumes) {
-      const fullResume = await getResumeById(r._id, session.userId);
-      if (fullResume?.jdId === jd._id) {
+      const fullResume = await getResumeById(r.id, session.userId);
+      if (fullResume?.jd_id === jd.id) {
         resume = fullResume;
-        resumeId = r._id;
+        resumeId = r.id;
         break;
       }
     }
@@ -52,20 +52,20 @@ export async function POST(
       if (standardResumes.length === 0) {
         return validationErrorResponse("请先创建标准版简历");
       }
-      resume = await getResumeById(standardResumes[0]._id, session.userId);
-      resumeId = standardResumes[0]._id;
+      resume = await getResumeById(standardResumes[0].id, session.userId);
+      resumeId = standardResumes[0].id;
     }
 
     if (!resume || !resumeId) return validationErrorResponse("简历不存在或无权访问");
-    if (!resume.content?.zh) return validationErrorResponse("简历缺少中文版内容");
+    if (!resume.raw_content) return validationErrorResponse("简历缺少中文版内容");
 
     const resumeSnapshot = {
-      resumeId: resume._id,
-      targetRole: resume.targetRole,
-      contentZh: resume.content.zh,
+      resumeId: resume.id,
+      targetRole: resume.target_role ?? undefined,
+      contentZh: resume.raw_content,
     };
     const jdSnapshot = {
-      jdId: jd._id,
+      jdId: jd.id,
       title: jd.structured.title,
       company: jd.structured.company,
       hardSkills: jd.structured.hardSkills.map((s) => ({ name: s.name, weight: s.weight })),
@@ -73,7 +73,7 @@ export async function POST(
 
     const messages = buildInterviewGenerateMessages({
       jdStructured: jd.structured,
-      resumeZhContent: resume.content.zh,
+      resumeZhContent: resume.raw_content,
     });
 
     const aiResponse = await callDeepSeekWithRetry(messages, {
@@ -87,7 +87,7 @@ export async function POST(
     const interview = await createInterview({
       userId: session.userId,
       resumeId,
-      jdId: jd._id,
+      jdId: jd.id,
       resumeSnapshot,
       jdSnapshot,
       questionTypes: ["technical", "behavioral", "case", "general"],

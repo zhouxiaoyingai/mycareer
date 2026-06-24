@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getResumeById, updateResume } from "@/lib/cloudbase/resumes";
-import { getJdById } from "@/lib/cloudbase/jds";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getResumeById, updateResume } from "@/lib/supabase/db/resumes";
+import { getJdById } from "@/lib/supabase/db/jds";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import {
   buildGreetingMessages,
@@ -35,26 +35,26 @@ export async function POST(
       );
     }
 
-    if (!resume.matchAnalysis) {
+    if (!resume.match_analysis) {
       return validationErrorResponse(
         "该简历缺少匹配度分析，请先生成定制简历",
       );
     }
 
-    if (!resume.jdId) {
+    if (!resume.jd_id) {
       return validationErrorResponse("该简历缺少关联的 JD");
     }
 
-    const jd = await getJdById(resume.jdId, session.userId);
+    const jd = await getJdById(resume.jd_id, session.userId);
     if (!jd) {
       return errorResponse("NOT_FOUND", "关联的 JD 不存在", 404);
     }
 
-    const resumeZhContent = resume.content?.zh ?? "";
+    const resumeZhContent = resume.raw_content ?? "";
 
     const messages = buildGreetingMessages({
-      jdTitle: jd.targetRole || jd.structured?.title || "目标岗位",
-      matchAnalysis: resume.matchAnalysis,
+      jdTitle: jd.target_role || jd.structured?.title || "目标岗位",
+      matchAnalysis: resume.match_analysis,
       resumeZhContent,
     });
 
@@ -69,7 +69,7 @@ export async function POST(
     const nextVersion = (resume.greeting?.version ?? 0) + 1;
     const greeting = {
       text: result.text,
-      generatedAt: new Date(),
+      generatedAt: new Date().toISOString(),
       version: nextVersion,
     };
 

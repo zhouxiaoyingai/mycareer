@@ -1,38 +1,19 @@
 // lib/supabase/db/resumes.ts
 import { createClient } from "../server";
+import type { Resume, ResumeSourceType, ResumeStatus, ResumeType } from "@/types/resume";
 
-export interface Resume {
-  id: string;
-  user_id: string;
-  type: "standard" | "tailored";
-  source_type: "upload" | "paste";
-  source_file_id: string | null;
-  raw_content: string;
-  structured: Record<string, unknown>;
-  target_role: string | null;
-  parent_id: string | null;
-  provenance: unknown[];
-  ai_flavor_score: number | null;
-  status: "draft" | "confirmed" | "archived";
-  greeting: unknown | null;
-  jd_id: string | null;
-  match_analysis: unknown | null;
-  confirmable_items: unknown | null;
-  confirm_completed: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export type { Resume, ResumeSourceType, ResumeStatus, ResumeType };
 
 export interface CreateResumeInput {
   userId: string;
-  type: "standard" | "tailored";
-  sourceType: "upload" | "paste";
+  type: ResumeType;
+  sourceType: ResumeSourceType;
   rawContent: string;
-  structured: Record<string, unknown>;
+  structured: Resume["structured"];
   sourceFileId?: string;
   targetRole?: string;
   parentId?: string;
-  status?: Resume["status"];
+  status?: ResumeStatus;
 }
 
 export async function listResumesByUser(

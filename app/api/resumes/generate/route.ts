@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { requireAuth } from "@/lib/cloudbase/auth";
-import { getResumeById, createResume, updateResume } from "@/lib/cloudbase/resumes";
+import { requireAuth } from "@/lib/supabase/auth";
+import { getResumeById, createResume, updateResume } from "@/lib/supabase/db/resumes";
 import { callDeepSeekWithRetry } from "@/lib/ai/deepseek";
 import {
   buildResumeGenerateMessages,
@@ -78,26 +78,26 @@ export async function POST(request: NextRequest) {
     const standardResume = await createResume({
       userId: session.userId,
       type: "standard",
-      sourceType: master.sourceType,
-      sourceFileId: master.sourceFileId,
-      rawContent: master.rawContent,
+      sourceType: master.source_type,
+      sourceFileId: master.source_file_id ?? undefined,
+      rawContent: master.raw_content,
       structured: master.structured,
-      targetRole,
+      targetRole: targetRole ?? undefined,
       parentId: masterResumeId,
       status: "draft",
     });
 
     // 更新 standard 简历的 content/provenance/aiFlavorScore，状态置为 completed
-    await updateResume(standardResume._id, session.userId, {
-      content: result.content,
+    await updateResume(standardResume.id, session.userId, {
+      raw_content: result.content.zh,
       provenance: result.provenance,
-      aiFlavorScore,
+      ai_flavor_score: aiFlavorScore,
       status: "completed",
     });
 
     return successResponse({
-      resumeId: standardResume._id,
-      content: result.content,
+      resumeId: standardResume.id,
+      raw_content: result.content.zh,
       provenance: result.provenance,
       aiFlavorScore,
       aiFlavorPassed: zhFlavor.passed && enFlavor.passed,
