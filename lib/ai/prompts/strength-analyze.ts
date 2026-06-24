@@ -12,10 +12,6 @@ import type {
   RealityCheck,
 } from "@/types/strength";
 import { callDeepSeekForJSON } from "../deepseek";
-import {
-  getStrengthReportById,
-  updateStrengthReportContent,
-} from "@/lib/cloudbase/strength";
 
 const SYSTEM_PROMPT = `你是一位资深职业规划师和 HR，擅长从长期眼光发现人才的潜在优势。
 你的职责是分析用户的技能、经验和兴趣，发现他们可能的职业规划路径。
@@ -164,25 +160,18 @@ export type {
 
 /**
  * 同步生成优势报告（一次性调用 DeepSeek 解析 JSON）
- * 由 POST /api/strength/reports 在后台触发，不等待完成
- * @param reportId 报告 ID
- * @param userId 用户 ID（用于权限校验）
+ * 纯函数：只负责 AI 调用和数据组装，不读写数据库。
+ * 由 POST /api/strength/reports 在后台调用，调用方负责持久化结果。
+ * @param answers 问卷答案
+ * @returns AI 生成的报告内容
  */
 export async function generateStrengthReport(
-  reportId: string,
-  userId: string
-): Promise<void> {
-  // 1. 读取记录（同时校验权限）
-  const report = await getStrengthReportById(reportId, userId);
-  if (!report) {
-    console.error(`[strength] report ${reportId} not found or no access`);
-    return;
-  }
+  answers: StrengthAnswers
+): Promise<StrengthReportContent> {
+  // 1. 构造消息
+  const messages = buildStrengthAnalyzeMessages(answers);
 
-  // 2. 构造消息
-  const messages = buildStrengthAnalyzeMessages(report.answers);
-
-  // 3. 一次性调用 DeepSeek（JSON 格式）
+  // 2. 一次性调用 DeepSeek（JSON 格式）
   type GeneratedReport = {
     transferableSkills: TransferableSkill[];
     careerPaths: CareerPath[];
@@ -196,16 +185,13 @@ export async function generateStrengthReport(
       maxTokens: 4096,
     });
   } catch (err) {
-    console.error(`[strength] DeepSeek call failed for ${reportId}:`, err);
-    // 状态保持 in_progress，让前端显示「重试」
+    console.error(`[strength] DeepSeek call failed:`, err);
     throw err;
   }
 
-  // 4. 写入报告
-  const finalReport: StrengthReportContent = {
+  // 3. 组装报告
+  return {
     ...generated,
     generatedAt: new Date(),
   };
-  await updateStrengthReportContent(reportId, userId, finalReport);
-  console.log(`[strength] report ${reportId} generated successfully`);
 }
