@@ -10,12 +10,23 @@ import type { StrengthAnswers } from "@/types/strength";
 
 describe("buildStrengthAnalyzeMessages", () => {
   it("包含系统提示词和用户消息", () => {
-    const answers: Partial<StrengthAnswers> = {
+    const answers: StrengthAnswers = {
       currentStage: "employed-exploring",
       flowExperiences: ["building-things"],
       achievementType: "solving-hard-problems",
+      workEnvironmentPreferences: {
+        remoteWork: 3,
+        stability: 3,
+        fastPaced: 3,
+        teamwork: 3,
+        independence: 3,
+        creativity: 3,
+      },
+      valueRanking: ["成长", "助人", "影响", "收入", "平衡", "挑战"],
+      riskTolerance: "中等",
+      yearsOfExperience: 3,
     };
-    const messages = buildStrengthAnalyzeMessages(answers as StrengthAnswers);
+    const messages = buildStrengthAnalyzeMessages(answers);
     expect(messages).toHaveLength(2);
     expect(messages[0].role).toBe("system");
     expect(messages[0].content).toContain("职业规划师");
