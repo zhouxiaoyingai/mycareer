@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/cloudbase/auth";
+import { getCurrentUser } from "@/lib/supabase/auth";
 import { successResponse, unauthorizedResponse } from "@/lib/utils/response";
 
 export async function GET() {

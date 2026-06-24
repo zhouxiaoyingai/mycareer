@@ -1,7 +1,16 @@
 import { NextRequest } from "next/server";
-import { loginSchema } from "@/lib/utils/validation";
-import { loginUser, setSession } from "@/lib/cloudbase/auth";
-import { successResponse, validationErrorResponse, unauthorizedResponse } from "@/lib/utils/response";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import {
+  successResponse,
+  validationErrorResponse,
+  unauthorizedResponse,
+} from "@/lib/utils/response";
+
+const loginSchema = z.object({
+  email: z.string().email("邮箱格式不正确"),
+  password: z.string().min(1, "密码不可为空"),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,16 +21,20 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password } = parsed.data;
+    const supabase = await createClient();
 
-    const { user, token } = await loginUser(email, password);
-    await setSession(token);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error || !data.user) {
+      return unauthorizedResponse("邮箱或密码错误");
+    }
 
     return successResponse({
       user: {
-        _id: user._id,
-        email: user.email,
-        displayName: user.displayName,
-        preferredLang: user.preferredLang,
+        id: data.user.id,
+        email: data.user.email,
       },
     });
   } catch (error) {

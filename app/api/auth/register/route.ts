@@ -1,12 +1,19 @@
 import { NextRequest } from "next/server";
-import { registerSchema } from "@/lib/utils/validation";
-import { registerUser, loginUser, setSession } from "@/lib/cloudbase/auth";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { ensureProfile } from "@/lib/supabase/db/profiles";
 import {
   successResponse,
   validationErrorResponse,
-  internalErrorResponse,
   errorResponse,
+  internalErrorResponse,
 } from "@/lib/utils/response";
+
+const registerSchema = z.object({
+  email: z.string().email("邮箱格式不正确"),
+  password: z.string().min(8, "密码至少 8 位"),
+  displayName: z.string().min(1, "昵称不可为空").optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,21 +24,38 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password, displayName } = parsed.data;
+    const supabase = await createClient();
 
-    try {
-      await registerUser(email, password, displayName);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "注册失败";
-      if (msg.includes("已注册")) {
-        return errorResponse("CONFLICT", msg, 409);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName ?? "" } },
+    });
+    if (error || !data.user) {
+      const msg = error?.message ?? "注册失败";
+      if (msg.toLowerCase().includes("already registered")) {
+        return errorResponse("CONFLICT", "该邮箱已注册", 409);
       }
-      throw err;
+      return errorResponse("VALIDATION_ERROR", "注册失败: " + msg, 400);
     }
 
-    const { token } = await loginUser(email, password);
-    await setSession(token);
+    // 创建 profile 记录(service role 绕过 RLS)
+    try {
+      await ensureProfile(data.user.id, email);
+    } catch (err) {
+      console.error("[register] ensureProfile failed:", err);
+      // profile 创建失败不影响注册成功(用户已通过 signUp)
+    }
 
-    return successResponse({ success: true }, 201);
+    return successResponse(
+      {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+        },
+      },
+      201
+    );
   } catch (error) {
     console.error("注册失败:", error);
     return internalErrorResponse(
