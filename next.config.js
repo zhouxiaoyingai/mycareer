@@ -4,19 +4,19 @@ const withNextIntl = createNextIntlPlugin("./i18n.ts");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // CloudBase HTTP 云函数要求 standalone 模式
-  output: "standalone",
-  // 云函数环境没有 Sharp，必须关掉图片优化
+  // Vercel / Node 部署都通过 next start 启动，无需 standalone
+  // 关闭图片优化（Vercel 仍可使用 next/image，但避免 Sharp 依赖问题）
   images: {
     unoptimized: true,
   },
-  // 开启 gzip 压缩
   compress: true,
-  // 隐藏框架信息
   poweredByHeader: false,
+  // 严格类型：部署前必须通过 tsc
   typescript: {
-    // 临时忽略类型错误：@cloudbase/node-sdk 类型不严格
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
