@@ -1,53 +1,66 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 
-export async function GET(_request: NextRequest) {
+export const dynamic = "force-dynamic";
+export const maxDuration = 10;
+
+export async function GET(_req: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "(missing)";
-  const hasKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const hasAnon = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const hasService = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const result: Record<string, unknown> = {
-    env: {
-      NEXT_PUBLIC_SUPABASE_URL: url,
-      has_anon_key: hasKey,
-      has_service_role: hasService,
-      node_env: process.env.NODE_ENV,
-      vercel_region: process.env.VERCEL_REGION ?? "(not on vercel)",
-    },
-  };
+  const stages: Array<{ stage: string; ms: number; info: unknown }> = [];
+  const t0 = Date.now();
+  const tick = (stage: string, info: unknown = null) =>
+    stages.push({ stage, ms: Date.now() - t0, info });
 
-  // Test 1: anonymous health endpoint
+  tick("env-loaded", { url, hasAnon, hasService, region: process.env.VERCEL_REGION });
+
+  // Stage 1: DNS resolve
   try {
-    const r = await fetch(`${url}/auth/v1/health`, {
-      signal: AbortSignal.timeout(8000),
-    });
-    result.health = { ok: true, status: r.status, body: await r.text() };
+    const u = new URL(url);
+    const dnsMod = await import("node:dns/promises");
+    tick("dns-start", { host: u.hostname });
+    const addrs = await Promise.race([
+      dnsMod.lookup(u.hostname, { all: true }),
+      new Promise<never>((_, rej) => setTimeout(() => rej(new Error("dns-timeout-3s")), 3000)),
+    ]);
+    tick("dns-ok", addrs);
   } catch (e) {
-    result.health = {
-      ok: false,
-      error: e instanceof Error ? e.message : String(e),
-      cause: e instanceof Error && "cause" in e ? String((e as Error & { cause?: unknown }).cause) : undefined,
-    };
+    tick("dns-fail", { msg: e instanceof Error ? e.message : String(e) });
   }
 
-  // Test 2: Supabase client signup (closest to register flow)
+  // Stage 2: TCP connect (raw)
   try {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: `diag_${Date.now()}@example.com`,
-      password: "Test1234!",
+    const u = new URL(url);
+    const net = await import("node:net");
+    tick("tcp-start", { port: 443, host: u.hostname });
+    const tcpOk = await new Promise<boolean>((resolve) => {
+      const sock = net.createConnection({ host: u.hostname, port: 443, family: 4 });
+      const timer = setTimeout(() => { sock.destroy(); resolve(false); }, 5000);
+      sock.once("connect", () => { clearTimeout(timer); sock.end(); resolve(true); });
+      sock.once("error", (err) => { clearTimeout(timer); resolve(false); });
     });
-    result.signup = error
-      ? { ok: false, error: error.message, status: error.status }
-      : { ok: true, user_id: data.user?.id, email: data.user?.email };
+    tick("tcp-result", { ok: tcpOk });
   } catch (e) {
-    result.signup = {
-      ok: false,
-      error: e instanceof Error ? e.message : String(e),
-      cause: e instanceof Error && "cause" in e ? String((e as Error & { cause?: unknown }).cause) : undefined,
-      stack: e instanceof Error ? e.stack?.split("\n").slice(0, 5).join("\n") : undefined,
-    };
+    tick("tcp-fail", { msg: e instanceof Error ? e.message : String(e) });
   }
 
-  return Response.json(result, { status: 200 });
+  // Stage 3: HTTPS via global fetch with short timeout
+  try {
+    tick("fetch-start");
+    const r = await Promise.race([
+      fetch(`${url}/auth/v1/health`, { signal: AbortSignal.timeout(4000) }),
+      new Promise<never>((_, rej) => setTimeout(() => rej(new Error("fetch-timeout-5s")), 5000)),
+    ]);
+    tick("fetch-ok", { status: (r as Response).status });
+  } catch (e) {
+    const err = e as Error & { cause?: unknown };
+    tick("fetch-fail", {
+      msg: err.message,
+      cause: err.cause ? (err.cause as Error).message ?? String(err.cause) : null,
+      code: (err.cause as { code?: string })?.code,
+    });
+  }
+
+  return Response.json({ stages }, { status: 200 });
 }
